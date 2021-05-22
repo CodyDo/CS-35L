@@ -1,0 +1,159 @@
+Cody Do
+105140467
+
+Assignment 4 -- Lab: Installing a small change to a big package
+
+1. 
+CMDS: wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz
+      wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz.sig
+      wget https://ftp.gnu.org/gnu/gnu-keyring.gpg
+
+=> Used wget to pull the coreutils 8.29 source code, the signature
+   and the GNU-Keyring.
+
+CMD:  gpg --verify --keyring ./gnu-keyring.gpg coreutils-8.29.tar.xz.sig 
+
+OUTPUT:
+gpg: Signature made Wed 27 Dec 2017 10:29:05 AM PST using RSA key ID 306037D9
+gpg: Good signature from "Pádraig Brady <P@draigBrady.com>"
+gpg:                 aka "Pádraig Brady <pbrady@redhat.com>"
+gpg:                 aka "Pádraig Brady <pixelbeat@gnu.org>"
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 6C37 DC12 121A 5006 BC1D  B804 DF6F D971 3060 37D9
+
+=> The WARNING provided by gpg is because I used a signature downloaded from
+online as a verification. This key was not marked as trusted and thus we can't
+tell if this signature belongs to the actual owner.
+
+
+2.
+CMD: tar -xJvf coreutils-8.29.tar.xz
+
+=> Unzips the coreutils-8.29 tar. -x is used to extract to the files from
+archive, -J is used to filter for .xz, -v represents verbose and -f allows
+me to specify the filename (pulled directly from Hints slides).
+
+CMDS: cd coreutils-8.29
+      emacs INSTALL
+
+=> Entered the extracted directory and read the INSTALL file to find out how to
+properly install coreutils-8.29. 
+
+CMD:  cd ..
+      mkdir cloneCoreUtils8.29
+      cd coreutils-8.29
+      ./configure --prefix=/u/cs/ugrad/codyd/cs35L/assignment4/cloneCoreUtils8.29
+
+=> I found out how to config coreutils and set an absolute path (confirmed by the
+Hints slide). I made a directory to store the broken coreutils-8.29 in and ran the
+configure code to properly configure the package before I make it.
+
+CMD: make
+     make install
+
+=> The 'make' command compiles the package. The 'make install' command properly
+installs the package at the location specified by configure in the previous
+command. coreutils8.29 is successfully installed and I did not run into any
+errors.
+
+
+3.
+CMDS: cd ..
+      cd cloneCoreUtils8.29
+      ./bin/ls -aA
+
+OUTPUT: . .. bin libexec share
+
+=> Running the 'ls -aA' command still results in both '.' and '..' being
+displayed, despite the presence of 'A'. Thus, the bug has been reproduced and is
+present in this version.
+
+
+4.
+CMDS: cd ..
+      cd coreutils-8.29
+      wget "https://debbugs.gnu.org/cgi/bugreport.cgi?filename=0001-ls-A-now-
+            overrides-a.patch;msg=10;att=1;bug=30963"
+      mv bugreport.cgi\?filename\=0001-ls-A-now-overrides-a.patch\;msg\=10\;att\
+         =1\;bug\=30963 patch.diff
+      emacs patch.diff (to check)
+
+=> Entered the coreutils-8.29 folder and pulled the patch from the thread. I then
+renamed it to 'patch.diff' 
+
+CMD: patch -p1 < patch.diff
+
+=> This applies the patch to the coreutils-8.29 package. The -p1 is used since
+the patch file is within the coreutils-8.29 folder and therefore, the first
+slash must be removed since patch is in a directory with 'src'.
+
+
+5.
+CMD: make
+
+=> An error is given that says 'automake-1.15 is missing on your system.'
+Error 127.
+
+CMD: autoreconf -fi
+     make
+
+=> The first command was pulled from the Hints slide. It will properly configure
+the package, allowing make to run correctly.
+
+OUTPUT (COMMANDS):
+make  all-recursive
+make[1]: Entering directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29'
+Making all in po
+make[2]: Entering directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29/po'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29/po'
+Making all in .
+make[2]: Entering directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29'
+make[3]: Entering directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29'
+make[3]: Leaving directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29'
+make[2]: Leaving directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29'
+Making all in gnulib-tests
+make[2]: Entering directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29/gnulib-tests'
+make  all-recursive
+make[3]: Entering directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29/gnulib-tests'
+Making all in .
+make[4]: Entering directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29/gnulib-tests'
+make[4]: Nothing to be done for 'all-am'.
+make[4]: Leaving directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29/gnulib-tests'
+make[3]: Leaving directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29/gnulib-tests'
+make[2]: Leaving directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29/gnulib-tests'
+make[1]: Leaving directory '/w/home.07/cs/ugrad/codyd/cs35L/assignment4/coreutils
+-8.29'
+
+
+=> These are the commands run by make. This is where make enters the files altered
+by the 'patch.diff' file and makes any changes that were described in it.
+
+
+6. 
+CMD: ./src/ls -aA
+
+=> No '.' or '..' are present when running this command. The patch was successfully
+applied.
+
+CMDS: cd ..
+      cd cloneCoreUtils8.29
+      ./bin/ls -aA
+
+=> '.' and '..' still make an appearance here, meaning the bug is still present in
+the old unpatched version if coreutils-8.29
+

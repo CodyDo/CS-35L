@@ -1,0 +1,89 @@
+Cody Do
+Lab 1
+105140467
+
+Assignment 2 - Laboratory
+
+
+Part 1:
+
+For this lab:
+   lnxsrv06 - Client
+   lnxsrv07 - Server
+
+ssh codyd@lnxsrv06.seas.ucla.edu
+   // (Entered my password when prompted)
+
+ssh-keygen
+   // (When asked for password, I pressed 'Enter' for no password)
+
+ssh-copy-id codyd@lnxsrv07.seas.ucla.edu
+   // (Entered my SEASnet password when prompted)
+
+ssh codyd@lnxsrv07.seas.ucla.edu
+   // (Successfully logged into lnxsrv07 with no password. Part 1 is complete.)
+
+
+Part 2:
+
+*Logged out completely, installed XQuartz, and restarted
+
+xeyes
+   // (Tried on local machine to make sure it worked first)
+
+ssh -X codyd@lnxsrv06.seas.ucla.edu
+   // (Entered my SEASnet password when prompted)
+
+xeyes
+   // (Gave output of "Error: Can't open display:")
+
+logout
+
+ssh -X codyd@lnxsrv06.seas.ucla.edu
+   // (Entered my SEASnet password when prompted)
+
+xeyes
+   // (The graphical window properly appeared on my window. Part 2 is complete.)
+
+
+Part 3:
+
+*Starting off inside lnxsrv06
+
+cd .ssh
+
+emacs config
+   // (create config file for ssh)
+
+I inserted the following into the config file:
+
+Host srv7
+  HostName lnxsrv07.seas.ucla.edu
+  User codyd
+
+Host srv8
+  HostName lnxsrv08.seas.ucla.edu
+  User codyd
+  ProxyJump srv7, srv8
+
+Host srv9
+  HostName lnxsrv09.seas.ucla.edu
+  User codyd
+  ProxyJump srv8, srv9
+
+// I created three Hosts: srv7, srv8, and srv9. The appropriate HostName and User
+// was provided for each one (in reference to my own account). It's linked together
+// so that in order so that, in order to access srvX, all servers below X must first
+// be accessed. Thus, to if I did ssh srv9, the machine would access srv7 first, 
+// jump to srv8, then from srv8, jump to srv9. This was tested using the following
+// commands inside lnxsrv06:
+
+ssh srv7
+logout
+ssh srv8
+logout
+ssh srv9
+logout
+
+// After each logout session, I was properly logged back into lnxsrv06. Part 3 is complete.
+

@@ -1,0 +1,65 @@
+Cody Do
+105140467
+
+Assignment 4 -- Homework: Rewriting a Script
+                                                                                
+1. On a usage level, the patch improves the performance of ls. This is because
+the ls command works in the appropriate manner, allowing people to use the
+use the command and produce the proper results. Furthermore, on a performance
+level, this patch increases the ls command's efficiency. Looking at the patch
+file, the comparison statement "if (ignore_mode == IGNORE_DEFAULT)" and the
+command "ignore_mode = IGNORE_DOT_AND_DOTDOT" if true are removed. Replacing
+this is simply the "ignore_mode = IGNORE_DOT_AND_DOTDOT" line. As the program
+doesn't need to compare ignore_mode and IGNORE_DEFAULT, ls is more effective
+and takes less time time run.
+
+
+2. If my company adopts this patched version of Coreutils instead of the
+default one, the only thing that needs to be watched would be the ls command's
+A flag usage. Looking at the diff file tells us that only 4 things were edited:
+News, ls.c, a-option.sh, and local.mk. News is completely safe as it's merely
+comments telling the user what was changed. The next two are the alterations
+made to the ls command's A flag, and the last change were changes to make. 
+
+
+3. When running "python2 randline.py /dev/null", the following error is given:
+Traceback (most recent call last):
+  File "randline.py", line 70, in <module>
+    main()
+  File "randline.py", line 64, in main
+    sys.stdout.write(generator.chooseline())
+  File "randline.py", line 34, in chooseline
+    return random.choice(self.lines)
+  File "/usr/local/cs/Python-2.7.18/lib/python2.7/random.py", line 277, in 
+    choice
+    return seq[int(self.random() * len(seq))]  # raises IndexError if seq is 
+    empty
+IndexError: list index out of range
+
+=> This error is because chooseline() is attempting to pick a random line from
+the input file. However, since the input file is empty, this command results
+in unwanted behavior. This ultimately causes seq to access a value that it
+cannot, resulting in an IndexError.
+
+
+4. When running "python3 randline.py /dev/null", the following error is given:
+  File "/w/home.07/cs/ugrad/codyd/cs35L/assignment4/randline.py", line 65
+    except IOError as (errno, strerror):
+                      ^
+
+=> This error occurs due because python3 has a different syntax than python2
+in certain aspects. For this case, "except IOError as (errno, strerror):" 
+should instead be "except OSError as err:". If this were changed, this could
+would properly work in python3.
+
+
+5. When I run shuf.py on python2, everything still works. I tried out multiple
+test cases ranging from "python2 shuf.py", "python2 shuf.py -i 0-10", and even
+providing a non-existing file "python2 shuf.py iDontExist". I even tried using
+python2 with the '-3' flag to check for compatibility issues when running the
+code but nothing came up. No matter which test cases I provide, file still runs
+the same as in python3. This is because the core syntax of python was kept
+between python2 and python3, with differences primarily in more complicated
+command syntax or management of data on the machine-side rather than the 
+user-side.
+

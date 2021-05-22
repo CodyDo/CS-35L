@@ -1,0 +1,61 @@
+Cody Do
+Lab 1
+105140467
+
+Assignment 2 -- Homework
+
+COMMANDS:
+
+gpg2 --gen-key
+   // Selected option (1) RSA and RSA (default)
+   // Selected keysize 2048 (default)
+   // Selected 1y so key expires in one year at Fri 15 Oct 2021 09:19:47 PM PDT
+   // Input real name, email address, comment, and passphrase
+   // Real name: CodyDo, Email: D.Codyx@gmail.com, passphrase: 547227
+
+gpg2 --export -a "CodyDo" > hw-pubkey.asc
+
+gpg2 --output hw-pubkey.sig --detach-sig hw-pubkey.asc
+
+gpg2 --verify hw-pubkey.sig hw-pubkey.asc
+   //Output Good signature
+
+
+QUESTIONS:
+
+1. Even if other teams had been observing all the bytes through the network, my resulting
+network would still be secure. This is because asymmetric encryption was utilized in order
+to protect this data. The text was encrypted using the recipient's public key before
+being sent out to through the network. The only way to properly decrypt this text is for
+the recipient to use their private key——a key that only the recipient has access to. Thus
+if others had been monitoring the network, all they would receive would be encrypted data
+with no way to decrypt it.
+
+   Part (1): If the other teams were able to tap into my keyboard and record my keystrokes
+then my answer would change. The network would thus not be quite as secure as initially
+hoped. Though they would be unable to access my private key, they would have been able to
+record my passcode. Using this passcode, they could access my files/network. 
+
+   Part (2): Under the assumption that the USB held the system/network files and that the
+other team got physical possession of the USB, then the network and data would most
+definitely not be secure. Their possession of the USB allows them access to the private
+key used to initially encrypt the data. Thus, they would be able to easily decrypt any
+files and get the information. However, if the USB is merely a tool where encrypted files
+were placed after being encrypted on my local machine, then no threat is made to the 
+security of the files and network.
+
+
+2. The gpg2 --verify command does not actually verify that I personally created the file,
+but rather checks if the detached signature and the file match. Thus, if this was all we
+relied on, then someone could easily intercept the file, change its contents, and produce
+a new signature. Ultimately, the signature and file would match, but the original contents
+have been changed. 
+
+As discussed in lab, there are two ways to circumvent this. I could publish my public key
+online and allow people to check themselves that the document was indeed from me. The 
+second method is merely to have a third-party trusted organization keep track of all 
+public keys and who they correspond with. Thus, with absolute certainty, people can 
+be confident that the files they receive are from the correct individual——provided that
+the keys match.
+
+

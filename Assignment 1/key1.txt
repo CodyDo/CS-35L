@@ -1,0 +1,146 @@
+Cody Do
+105140467
+
+Assignment 1 -- Homework Exercises
+
+
+Exercise 1.1:
+
+
+1. e m a c s SP e x e r c i s e 1 . h t m l Enter
+
+2. C-s H T M L Enter
+
+3. C-s s c a Enter M-b
+
+4. C-s s e l Enter M-b
+
+5. C-s a r r Enter M-b
+
+6. C-e
+
+7. C-a
+
+8. In order to search for a word manually, one would need to scroll through the entirety of the html file and scan for the words. It's easier to instead use the C-s search command to find phrases. To get to the start of a word, simply press M-b instead of manually holding the left key. To get to the start or end of a line, it's much easier to simply press C-e or C-a respectively, as opposed to holding the arrow keys down.
+
+9. I did not do the above questions with arrow keys.
+
+10. C-x C-s C-x C-c
+
+
+Exercise 1.2:
+
+
+1. e m a c s SP e x e r 2 . h t m l Enter
+
+2. C-s <! Enter C-a C-k
+
+3. M-< C-s D E L Enter C-a C-k
+
+4. M-< C-s w i k i Enter C-a C-p C-k C-n C-k C-n C-k
+
+5. M-< C-s < ! - - Enter C-u 4 C-b M-z >
+   C-s < ! - - Enter C-a C-u 4 C-k
+   C-s < ! - - Enter C-a C-k
+
+
+Exercise 1.3:
+
+1. e m a c s SP e x e r 3 . h t m l Enter
+
+2. M-% A s s i g n m e n t SP 1 Enter A s s i g n m e n t SP 4 2 Enter y y C-g
+
+3. M-< M-% U T F - 8 Enter U S - A S C I I Enter y C-g
+
+4. C-M-s [ ^ [ : a s c i i : ] ] Enter C-a C-k C-M-s [ ^ [ : a s c i i : ] ] 
+
+5. M-< C-s < / o l > Enter Enter
+
+
+Exercise 1.4:
+
+
+1. Followed command provided in instructions
+
+2. e m a c s SP e x e r 4 . h t m l Enter
+
+3. (Obtained lines numbers using) C-x 3 C-x o C-x C-f e x e r 1 . h t m l C-s < ! C-s C-s C-s C-x 0
+   M-> C-r < ! Enter C-SP C-e M-w M-g g 455 C-u 4 C-p C-y
+   M-> C-r < ! C-r C-r Enter C-b C-b C-SP C-u 4 C-e M-w M-g g 433 C-e C-u 5 Backspace C-y
+   M-> C-r < ! C-r C-r C-r Enter C-SP C-n C-n c-e M-w M-g g 387 C-y
+   M-> C-r < ! C-r C-r C-r C-r Enter C-SP C-e M-w M-g g 131 C-y
+   M-> C-r < ! C-r C-r C-r C-r C-r Enter C-SP C-e M-w M-g g 19 C-y
+
+4. Done.
+
+5. M-< C-s - - - SP e x C-a C-SP M-> Backspace
+
+6. C-x u
+
+7. C-r - - - SP e x Enter < ! - - Enter M-> - - >
+
+8. M-< M-% <ol> Enter <oL> y y y y y y y C-g
+
+9. C-x C-s C-x C-c
+
+
+Exercise 1.5:
+
+
+1. M-x m a k e - d i r e c t o r y Enter junk Enter
+
+2. C-x C-f j u n k / h e l l o . c Enter
+   (Placed the given program into the new file)
+   C-x C-s
+
+3. M-x c o m p i l e Enter h e l l o Enter
+
+4. C-x b h e l l o - o u t Enter C-u M-! . / h e l l o
+
+5. C-SP M-> M-w C-x 3 C-x o C-x b k e y 1 . t x t Enter M-> C-y
+
+
+Exercise 1.6:
+
+
+1. C-x b * s c r a t c h *
+
+2. e v a l SP m o s t - n e g a t i v e - f i x n u m
+   RESULT: -2305843009213693952
+   e v a l SP m o s t - p o s i t i v e - f i x n u m
+   RESULT: 2305843009213693951
+   C-h f f o r m a t Enter
+   ( f o r m a t SP " % x " SP m o s t - n e g a t i v e - f i x n u m ) C-j
+   Result: -2000000000000000
+   ( f o r m a t SP " % x " SP m o s t - p o s i t i v e - f i x n u m ) C-j
+   Result: 1fffffffffffffff
+
+   Answer: most-negative-fixnum represents the largest negative signed integer that can be represented by 64 bits. most-positive-fixnum represents the largest positive signed integer that can be represented by 64 bits.
+
+3. ( r a n d o m SP " 1 0 5 - 1 4 0 - 4 6 7 " ) C-j
+   RESULT: 56957199139537482
+
+4. ( s e t q SP x SP ( r a n d o m ) ) C-j 
+   RESULT: x = -506133063904894244
+   ( s e t q SP y SP ( r a n d o m ) ) C-j
+   RESULT: y = 1560935105639449129
+
+5. ( s e t q SP p SP ( * SP x SP y ) ) C-j
+   RESULT: p = -790040867574004153644121583162913476
+   ( s e t q SP r SP ( logior SP p SP m o s t - n e g a t i v e - f i x n u m ) ) C-j
+   RESULT: r = -804510648130761412
+
+6. The results of x*y and r are different.
+
+7. In the mathematical sense, these numbers are not truly random. This is because true mathematical randomness requires that there are infinitely many numbers that all have an equal chance of being selected. However, on a 64-bit machine, there are actually a finite amount of numbers. More specifically, a 64-bit machine can display up to 2^64. Any value larger than 2^64 that requires more than 64 bits cannot be held by the machine and thus is removed from the selection pool.
+
+8. 
+
+Probability that x or y is a number that is <= 2^64:  (2^64)/INFINITY
+
+Probability that x will be a number larger then 2^64: 1 - (2^64)/INFINITY = 1
+
+Probability that y will be a number larger than 2^64: 1 - (2^64)/INFINITY = 1
+
+If the probability that both x and y are larger than 2^64 are both 1, then the probability that their product is greater than 2^64 is also 1. Assuming (random) is truly random, then the probability that the r value above is the mathematically correct product of the two integers x and y is 0. This is due to the limitations that exist on a 64-bit machine. There are infinitely many numbers that exist over 2^64, which is the maximum value that a computer can display. Anytime two values over 2^64 are multiplied on the machine, overflow will occur, resulting in a mathematically incorrect answer.
+

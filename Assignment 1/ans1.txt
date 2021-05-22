@@ -1,0 +1,494 @@
+Cody Do
+105140467
+
+Assignment 1 -- Laboratory Scavenger Hunt Answers
+
+1.
+Command: 
+   man man
+
+Answer: 
+   man -k [KEYWORD]
+
+Approach: 
+   I used man man and searched through the potential arguments. -k is described as "Search[ing] the short manual page descriptions for keywords and display[ing] any matches"
+
+
+2.
+Commands: 
+   man -k path
+   which mv
+   which sh
+
+Answers:
+   mv is located at /usr/local/cs/bin/mv
+   sh is located at /usr/bin/sh
+
+Approach: 
+   I originally used man -k location, but none of commands seemed relevant to the problem. Then I used man -k path and found the which command, which fits perfectly for what's asked.
+
+
+3.
+Commands: 
+   man find
+   find /usr/bin -executable -name ?r
+
+Answers: The following are two-letter commands found in bin that end in 'r' + their functions.
+   tr: Translates, squeezes, and/or deletes characters
+   ar: Creates, modifies, and extracts from archives
+   pr: Converts text files for printing
+
+Approach:
+    I used man find (given as a hint) to get more information on the find command. I then used it to narrow my search down properly to get the three commands above. I used man to find their functions.
+
+
+4.
+Commands:
+   man -k path
+   man realpath
+   which emacs
+   realpath /usr/local/cs/bin/emacs
+
+Answer:
+   /usr/local/cs/emacs-27.1/bin/emacs-27.1
+
+Approach:
+   I originally used man -k path to try to see if there was a way to jump to the emacs path directly. Instead, I found the 'realpath' command and used man realpath to read more about it. It seemed to correctly answer the question and so I used which emacs to get the appropriate link for realpath.
+
+REAL ANSWER: /usr/bin/emacs-24.3
+/etc/alternatives/emacs is also a symbolic link to /usr/bin/emacs-24.3
+
+
+5.
+Commands:
+   gcc -v
+   /usr/bin/gcc -v
+
+Answer:
+   The plain gcc is version 10.2.0
+   The /usr/bin/gcc is version 4.8.5
+
+Approach:
+   I used the hints given. gcc -v was to check the plain gcc and then I just copied the link provided by the instructions and checked the version.
+
+Local gcc (4.8.5) is a more recent version.
+
+
+6.
+Command:
+   man chmod
+
+Answer:
+   chmod u+sx: The u stands for the current user. The + means we are granting permissions based on the two letters that follow. The s sets the user's ID to that of the owner of the document upon execution. The x grants the user permission to execute the program. 
+   chmod o-w: The o stands for 'others' (not the user and not in a group). The - means we are removing permission based on the letter that follows. The w refers to write permission and thus, this command will remove the write permission from 'others' 
+
+Approach:
+   I used the hints and man chmod to help answer this question.
+
+
+7.
+Commands:
+   man find
+   find /usr/local/cs/ -type d -mtime -27
+
+Answer:
+   # of directories modified in the last 28 days: 580 directories
+   The first 5 of these 580:
+	/usr/local/cs/
+	/usr/local/cs/src/bash
+	/usr/local/cs/src/bash/RCS
+	/usr/local/cs/src/grep
+	/usr/local/cs/src/grep/RCS
+
+Approach:
+   I followed the hints given and used man find to read up on the extra tags/parameters. I used -type to make sure only directories were targeted and read up on the rounding information in -atime. This told me that I should use 27 instead of 28 as it appears to add an additional '1' due to the rounding logic.
+
+
+8.
+Commands:
+   man find
+   which find
+   find /usr/bin/ -type l
+
+Answer:
+   There are 280 symbolic links in /usr/bin/ 
+
+   They are listed below: 
+    /usr/bin/pmiostat
+    /usr/bin/xzfgrep
+    /usr/bin/updmap
+    /usr/bin/systemd-coredumpctl
+    /usr/bin/rpmquery
+    /usr/bin/links
+    /usr/bin/rmic
+    /usr/bin/jarsigner
+    /usr/bin/parec
+    /usr/bin/nc
+    /usr/bin/inimf
+    /usr/bin/gimp
+    /usr/bin/pnmtofits
+    /usr/bin/bunzip2
+    /usr/bin/arecord
+    /usr/bin/el5-rpmlint
+    /usr/bin/ppmtouil
+    /usr/bin/pinentry-gtk
+    /usr/bin/lastb
+    /usr/bin/gnroff
+    /usr/bin/unxz
+    /usr/bin/systemd-loginctl
+    /usr/bin/flex++
+    /usr/bin/javadoc
+    /usr/bin/paplay
+    /usr/bin/pack200
+    /usr/bin/slogin
+    /usr/bin/python2-config
+    /usr/bin/pnmtopnm
+    /usr/bin/rpmverify
+    /usr/bin/kdesu
+    /usr/bin/dviluatex
+    /usr/bin/jjs
+    /usr/bin/X
+    /usr/bin/javap
+    /usr/bin/gnatgcc
+    /usr/bin/gtroff
+    /usr/bin/atq
+    /usr/bin/jadetex
+    /usr/bin/texhash
+    /usr/bin/unix2mac
+    /usr/bin/texluac
+    /usr/bin/zsoelim
+    /usr/bin/pstack
+    /usr/bin/vimdiff
+    /usr/bin/tclsh
+    /usr/bin/psfaddtable
+    /usr/bin/servertool
+    /usr/bin/gemtopbm
+    /usr/bin/ebb
+    /usr/bin/psfgettable
+    /usr/bin/bzcat
+    /usr/bin/pnmcomp
+    /usr/bin/sgmlnorm
+    /usr/bin/pdfetex
+    /usr/bin/appletviewer
+    /usr/bin/spent
+    /usr/bin/el4-rpmlint
+    /usr/bin/gimp-console
+    /usr/bin/pnmenlarge
+    /usr/bin/dvi2fax
+    /usr/bin/wish
+    /usr/bin/combinediff
+    /usr/bin/kpsepath
+    /usr/bin/flipdiff
+    /usr/bin/jstat
+    /usr/bin/htmex
+    /usr/bin/apropos
+    /usr/bin/latrace-ctl
+    /usr/bin/pnmtotiff
+    /usr/bin/icontopbm
+    /usr/bin/byacc
+    /usr/bin/passwd
+    /usr/bin/httex
+    /usr/bin/rvi
+    /usr/bin/htcontext
+    /usr/bin/jmap
+    /usr/bin/db2rtf
+    /usr/bin/nisdomainname
+    /usr/bin/gpgv
+    /usr/bin/pdflatex
+    /usr/bin/linux32
+    /usr/bin/schemagen
+    /usr/bin/psfstriptable
+    /usr/bin/rksh
+    /usr/bin/dvired
+    /usr/bin/ppmquantall
+    /usr/bin/mail
+    /usr/bin/mac2unix
+    /usr/bin/dvipdfm
+    /usr/bin/Mail
+    /usr/bin/pdfxmltex
+    /usr/bin/pdfjadetex
+    /usr/bin/pnmdepth
+    /usr/bin/fmtutil
+    /usr/bin/rnano
+    /usr/bin/parecord
+    /usr/bin/rhn_register
+    /usr/bin/xzcmp
+    /usr/bin/gnome-keyring
+    /usr/bin/allneeded
+    /usr/bin/lz4cat
+    /usr/bin/bzless
+    /usr/bin/db2ps
+    /usr/bin/ksh
+    /usr/bin/mptopdf
+    /usr/bin/pnmscale
+    /usr/bin/db2dvi
+    /usr/bin/fmtutil-sys
+    /usr/bin/open
+    /usr/bin/latex
+    /usr/bin/jps
+    /usr/bin/setup-nsssysinit
+    /usr/bin/lex
+    /usr/bin/lp
+    /usr/bin/ht
+    /usr/bin/texlua
+    /usr/bin/pnmnoraw
+    /usr/bin/policyeditor
+    /usr/bin/kpsexpand
+    /usr/bin/bashbug
+    /usr/bin/sh
+    /usr/bin/pgmedge
+    /usr/bin/phar
+    /usr/bin/extractbb
+    /usr/bin/traceroute6
+    /usr/bin/ypdomainname
+    /usr/bin/grepdiff
+    /usr/bin/jstatd
+    /usr/bin/htxelatex
+    /usr/bin/newaliases.postfix
+    /usr/bin/i386
+    /usr/bin/dvigif
+    /usr/bin/pnmarith
+    /usr/bin/xzcat
+    /usr/bin/rmiregistry
+    /usr/bin/pstree.x11
+    /usr/bin/python2
+    /usr/bin/dvdrecord
+    /usr/bin/kpsewhere
+    /usr/bin/newaliases
+    /usr/bin/sgml2xml
+    /usr/bin/pgmnorm
+    /usr/bin/mktexfmt
+    /usr/bin/python
+    /usr/bin/pamrgbatopng
+    /usr/bin/etags
+    /usr/bin/linux64
+    /usr/bin/pax
+    /usr/bin/unpack200
+    /usr/bin/iptables-xml
+    /usr/bin/nmtui-edit
+    /usr/bin/ppmtojpeg
+    /usr/bin/dvilualatex
+    /usr/bin/setup
+    /usr/bin/gsoelim
+    /usr/bin/cdrecord
+    /usr/bin/reset
+    /usr/bin/jar
+    /usr/bin/ping6
+    /usr/bin/htxetex
+    /usr/bin/texconfig-sys
+    /usr/bin/cancel
+    /usr/bin/jade
+    /usr/bin/jstack
+    /usr/bin/nail
+    /usr/bin/orbd
+    /usr/bin/nmtui-connect
+    /usr/bin/db2pdf
+    /usr/bin/texconfig
+    /usr/bin/wsgen
+    /usr/bin/pgmoil
+    /usr/bin/updmap-sys
+    /usr/bin/itweb-settings
+    /usr/bin/pbmtoicon
+    /usr/bin/emacs
+    /usr/bin/lpr
+    /usr/bin/xmltex
+    /usr/bin/pngtopnm
+    /usr/bin/allcm
+    /usr/bin/desktop-file-edit
+    /usr/bin/jrunscript
+    /usr/bin/mkisofs
+    /usr/bin/pmevent
+    /usr/bin/allec
+    /usr/bin/jhat
+    /usr/bin/cc
+    /usr/bin/xjc
+    /usr/bin/atrm
+    /usr/bin/etex
+    /usr/bin/spam
+    /usr/bin/htlatex
+    /usr/bin/awk
+    /usr/bin/lpstat
+    /usr/bin/ghostscript
+    /usr/bin/rmid
+    /usr/bin/rmail
+    /usr/bin/ex
+    /usr/bin/lsdiff
+    /usr/bin/jconsole
+    /usr/bin/texlinks
+    /usr/bin/csh
+    /usr/bin/domainname
+    /usr/bin/hwloc-ls
+    /usr/bin/rview
+    /usr/bin/gpic
+    /usr/bin/lprm
+    /usr/bin/subscription-manager
+    /usr/bin/extcheck
+    /usr/bin/ppmtotga
+    /usr/bin/x86_64
+    /usr/bin/sg
+    /usr/bin/pnmfile
+    /usr/bin/pnminterp
+    /usr/bin/lualatex
+    /usr/bin/mk4ht
+    /usr/bin/f95
+    /usr/bin/mkluatexfontdb
+    /usr/bin/mkhybrid
+    /usr/bin/gneqn
+    /usr/bin/initex
+    /usr/bin/mysql_config
+    /usr/bin/serialver
+    /usr/bin/gpg
+    /usr/bin/keytool
+    /usr/bin/jdb
+    /usr/bin/pcp2csv
+    /usr/bin/captoinfo
+    /usr/bin/policytool
+    /usr/bin/thumbpdf
+    /usr/bin/pmcollectl
+    /usr/bin/java
+    /usr/bin/f2py.numpy
+    /usr/bin/native2ascii
+    /usr/bin/gtar
+    /usr/bin/ld
+    /usr/bin/pnmsplit
+    /usr/bin/kpsetool
+    /usr/bin/dnsdomainname
+    /usr/bin/bzcmp
+    /usr/bin/jsadebugd
+    /usr/bin/javaws
+    /usr/bin/infotocap
+    /usr/bin/simpdftex
+    /usr/bin/nmtui-hostname
+    /usr/bin/gtbl
+    /usr/bin/xzegrep
+    /usr/bin/view
+    /usr/bin/rvim
+    /usr/bin/python-config
+    /usr/bin/makeinfo
+    /usr/bin/ControlPanel
+    /usr/bin/jinfo
+    /usr/bin/unlz4
+    /usr/bin/nsgmls
+    /usr/bin/jdeps
+    /usr/bin/readcd
+    /usr/bin/nfs4_editfacl
+    /usr/bin/pango-querymodules-64
+    /usr/bin/javac
+    /usr/bin/pgmslice
+    /usr/bin/httexi
+    /usr/bin/gjs
+    /usr/bin/bmptoppm
+    /usr/bin/tnameserv
+    /usr/bin/pamon
+    /usr/bin/wsimport
+    /usr/bin/mailq
+    /usr/bin/texconfig-dialog
+    /usr/bin/libpng-config
+    /usr/bin/gmake
+    /usr/bin/javah
+    /usr/bin/lpq
+    /usr/bin/idlj
+    /usr/bin/chsh
+    /usr/bin/jcmd
+    /usr/bin/pnmcut
+    /usr/bin/geqn
+    /usr/bin/ppmnorm
+    /usr/bin/mailq.postfix
+
+Approach:
+   I followed the hints and read more about find using man find. I realized I could use -type l to look at only the symbolic links and then used which find to find the directory of find.
+
+
+9.
+Commands:
+   man ls
+   ls /usr/lib64/ -lt .* REAL ANSWER: ls /usr/lib64 -lta
+
+Answer:
+   librom1394.so.0.3.0
+
+Approach:
+   I followed the hints and used man ls to read more on the ls command. I found -lt which organizes the files by modification date with the oldest at the bottom. .* Is used to look for files that start with . with any number/combination of characters after.
+
+
+10.
+Commands:
+   man locale
+
+Answer:
+   As per the locale manual, locale 'displays the current locale setting for each locale category based on the settings of the environment variables that control the locale'.
+   BASICALLY: The environment variables.
+
+Approach:
+  I simply followed the hints and read the manual.
+
+
+11.
+Emacs Commands:
+   C-h a
+   d o w n c a s e  Enter
+
+Answer:
+   downcase-dwim
+   downcase-region
+   downcase-word
+
+Approach:
+   I followed the reference card given by the hints and found the appropriate command.
+
+12.
+Emacs Commands:
+   C-h
+   ?
+   b
+   C-x o
+   Enter
+
+Answers:
+   C-M-r (isearch-backward-regexp): Does an incremental search backward for regular expressions.
+   C-M-s (isearch-forward-regexp): Does an incremental search forward for regular expressions.
+   C-M-t (transpose-sexps): Similar to C-T, but applies to sexps. C-T interchanges characters around a point, moving forward one character.
+   C-M-u (backward-up-list): Moves backwards out of one level of parentheses.
+   C-M-v (scroll-other-window): Scroll next window upward ARG lines; or near full screen if no ARG.
+
+Approach:
+   I used C-h to see if there was any generic help window. I pressed ? after it prompted me and then pressed b to find any keybindings. I used C-x o to move to the new window and scrolled down to the commands. Enter was used to follow the hyper links.
+
+
+13.
+Emacs Commands:
+   C-h
+   ?
+   b
+   C-x o
+   Enter
+
+Answer:
+   C-g is known as 'keyboard-quit'. It signals a 'quit' condition. During execution of Lisp code, this character causes a quit directly. At top-level, as an editor command, it merely beeps.
+
+
+14.
+Emacs Commands:
+   C-h a
+   y a n k Enter
+
+Answer:
+   The yank command reinserts, or 'pastes', the last stretch of killed text. Yank can be easily invoked by pressing C-y.
+
+Approach:
+   I used C-h a to find the yank command. I simply scrolled down and read the information about the command.
+
+
+15.
+Shell Command:
+   ls /usr/bin -l
+
+Emacs Commands:
+   C-h a
+   d i r e d  Enter
+   C-x d / u s r / b i n  Enter
+
+Answer:
+   Using ls /usr/bin -l in the shell showed all the files inside the /usr/bin directory. However, when using C-x d /usr/bin inside Emacs, it showed all the files as well as the current and parent directories, denoted as '.' and '..' respectively.
+
+

@@ -1,0 +1,274 @@
+Cody Do
+105140467
+
+Assignment 5 -- Laboratory: Debugging a C Program
+                                                                                .
+1.
+CMD: wget https://web.cs.ucla.edu/classes/fall20/cs35L/assign/coreutils-with-bug
+          .tar.gz
+
+=> Used wget to get the coreutils-with-bug code as a compressed tar
+
+
+2.
+CMD: tar -xf coreutils-with-bug.tar.gz 
+
+=> Unzips coreutils-with-bug.tar.gz into the current directory. -x is used to
+extract the files from archive and -f allows me to specify the filename.
+
+
+3.
+CMDS: cd coreutils-with-bug/
+      emacs INSTALL
+      ./configure --prefix=/u/cs/ugrad/codyd/cs35L/assignment5/buggyCoreutils
+
+=> I entered the extracted directory and looked at the INSTALL file to figure
+out how to properly install it. It provided the appropriate instructions and
+with guidance from the Hints slide, I configured it to run with an absolute
+path.
+
+
+4.
+CMD: make
+
+OUTPUT/ERROR: 
+In file included from utimecmp.c:41:
+utimens.h:2:5: error: conflicting types for 'futimens'
+    2 | int futimens (int, char const *, struct timespec const [2]);
+      |     ^~~~~~~~
+In file included from utimecmp.h:25,
+                 from utimecmp.c:25:
+/usr/include/sys/stat.h:373:12: note: previous declaration of 'futimens' was here
+  373 | extern int futimens (int __fd, const struct timespec __times[2]) __THROW;
+      |            ^~~~~~~~
+
+=> This error arises because there are two functions defined with the exact same
+name (futimens).
+
+
+5.
+CMD: wget https://web.cs.ucla.edu/classes/fall20/cs35L/assign/coreutils.diff
+
+=> Used wget to pull the renaming patch from the website
+
+
+6.
+CMD: patch -p0 < coreutils.diff
+
+=> Applies the renaming patch to the files. It affected utimens.c, utimens.c,
+copy.c, tee.c, and touch.c
+
+
+7. 
+CMDS: make
+      make install
+      emacs coreutils.diff
+
+=> No errors were present this time. This is because the naming patch altered
+the conflicting functions. In particular, when looking at the diff file, one of 
+the functions was renamed to 'coreutils_futimens'
+
+
+8.
+CMDS: touch -d '1918-11-11 11:00 GMT' /run/user/$(id -u)/stamp-wwi-armistice
+      touch /run/user/$(id -u)/stamp-now
+      sleep 1
+      touch /run/user/$(id -u)/stamp-now1
+      TZ=UTC0 /u/cs/ugrad/codyd/cs35L/assignment5/buggyCoreutils/bin/ls -lt 
+         --full-time /run/user/$(id -u)/stamp*
+
+Output:
+-rw-r--r-- 1 codyd csugrad 0 1918-11-11 11:00:00.000000000 +0000 
+             /run/user/11975/stamp-wwi-armistice
+-rw-r--r-- 1 codyd csugrad 0 2020-11-09 07:01:59.930047979 +0000 
+             /run/user/11975/stamp-now1
+-rw-r--r-- 1 codyd csugrad 0 2020-11-09 07:01:52.131779526 +0000 
+             /run/user/11975/stamp-now
+
+=> Running the buggy ls on the files I created in /run/user/$(id -u) produced the
+same error as described on the website. The really old directory from 1918 is seen
+as a 'future' directory compared to recent ones. These files are NOT removed as
+I plan to use them for gdb testing later on.
+
+
+9. 
+CMDS: gdb ./src/ls
+      info functions
+      ENTER (multiple times)
+
+=> Entered gdb debugger with the buggy ls source code. Used 'info functions' to
+find all the defined functions in ./src/ls. Pressing enter allowed me to scroll
+down until I found the ls.c file. Here, I notice multiple compare functions.
+I ruled out anything that isn't a time comparison since that's where the bug lies.
+For this, I can look at 'compare_atime(V, V)', 'compare_ctime(V, V)', and
+'compare_mtime(V, V)'.
+
+
+10. 
+CMDS: break compare_atime
+      run -lt --full-time /run/user/$(id -u)/stamp*
+
+=> The program ran normally and outputted the buggy result. Thus, compare_atime
+must not be the source of the error since it never ran.
+
+
+11. 
+CMDS: break compare_ctime
+      run -lt --full-time /run/user/$(id -u)/stamp*
+
+=> The program ran normally and outputted the buggy result. Thus, compare_ctime
+must not be the source of the error since it never ran.
+
+
+12.
+CMDS: break compare_mtime
+      run -lt --full-time /run/user/$(id -u)/stamp*
+
+OUTPUT:
+Breakpoint 3, compare_mtime (a=0x618190, b=0x618240) at ls.c:2884
+2884	static int compare_mtime (V a, V b) { return cmp_mtime (a, b, xstrcoll); }
+
+=> Thus, compare_mtime was called for this function. Since compare_mtime calls on
+the function 'cmp_mtime', I will set a breakpoint for it below and continue.
+
+
+13.
+CMDS: break cmp_mtime
+      continue
+
+OUTPUT:
+Breakpoint 3, cmp_mtime (cmp=<optimized out>, b=0x618240, a=0x6180e0)
+    at ls.c:2880
+2880	  int diff = timespec_cmp (get_stat_mtime (&b->stat),
+
+=> cmp_mtime calls on timespec_cmp. So I will set a breakpoint for timespec_cmp
+and continue.
+
+
+14. 
+CMDS: break timespec_cmp
+      continue
+      list
+
+OUTPUT: 
+/* Return negative, zero, positive if A < B, A == B, A > B, respectively.
+44	   Assume the nanosecond components are in range, or close to it.  */
+45	static inline int
+46	timespec_cmp (struct timespec a, struct timespec b)
+47	{
+48	  int diff = a.tv_sec - b.tv_sec;
+49	  return diff ? diff : a.tv_nsec - b.tv_nsec;
+50	}
+
+=> I see that timespec_cmp does not call on any functions and instead performs
+arithmetic on its own. In order to better understand the code, I use the 'list'
+command to produce the above output. The error can be seen in the calculation for
+'diff'. When two dates are extremely far apart, (like our wwi-armistice file and
+our stamp-now files), the difference computed can result in integer overflow.
+When this happens, a 'wrap-around' effect occurs that will make the produced output
+have an extremely large value of the incorrect sign.
+
+
+15.
+CMDS: q
+      cd ..
+      cp ./coreutils-with-bug/lib/timespec.h timespec.h
+      emacs timespec.h
+      C-x C-s C-x C-c (Save and quit)
+      
+=> I quit gdb and moved out from the coreutils-with-bug directory. I then create
+a copy of the buggy timespec.h into this directory and edit it with emacs. After
+finding the fault area of code (given above), I replaced it with the following:
+
+timespec_cmp (struct timespec a, struct timespec b)
+{
+   if (a.tv_sec > b.tv_sec) {
+    return 1;
+  }
+  else if (a.tv_sec < b.tv_sec) {
+    return -1;
+  }
+  else {
+    return 0;
+  }
+}
+
+
+16.
+CMDS: diff -u coreutils-with-bug/lib/timespec.h timespec.h > 
+           coreutils-with-bug/lab5.diff
+
+=> Used the diff -u command to generate a file of differences between the old
+buggy timespec.h and the new edited timespec.h
+
+
+17.
+CMDS: cd coreutils-with-bug/
+      emacs lab5.diff
+      C-x 4-a (Changelog)
+      C-x C-s C-x C-c (Save and quit)
+
+=>Entered the coreutils-with-bug directory and edited lab5.diff on emacs. Used
+C-x 4-a to create a changelog entry and also copied the entry over into the 
+actual lab5.diff file. I also altered the path so that the patch would work 
+appropriately.
+
+CHANGELOG ENTRY:
+Changed the timespec_cmp function to use conditionals rather than arithmetic for 
+a comparison. This will ensure that integer overflow won't occur.
+
+PATH:
+'lib/timespec.h'
+
+
+18.
+CMD: patch -p0 < lab5.diff
+     make
+     make install
+
+=> After applying the patch and successfully changing timespec.h, I used 'make'
+and 'make install' to compile the package and properly install it with my
+changes.
+
+
+19.
+CMDS: TZ=UTC0 /u/cs/ugrad/codyd/cs35L/assignment5/buggyCoreutils/bin/ls -lt 
+         --full-time /run/user/$(id -u)/stamp*
+      rm /run/user/$(id -u)/stamp*
+
+OUTPUT:
+-rw-r--r-- 1 codyd csugrad 0 2020-11-10 02:01:18.592890324 +0000 
+             /run/user/11975/stamp-now1
+-rw-r--r-- 1 codyd csugrad 0 2020-11-10 02:01:13.269709484 +0000 
+             /run/user/11975/stamp-now
+-rw-r--r-- 1 codyd csugrad 0 1918-11-11 11:00:00.000000000 +0000 
+             /run/user/11975/stamp-wwi-armistice
+
+=> Using the files created in step 8, I tested the the patched version of ls.
+From the output, I can see that the bug has been properly fixed since the
+wwi-armistice stamp is seen as the oldest file rather than a file from the
+future. I then remove all these files since I no longer need them.
+
+
+20.
+CMDS: cd ~
+      touch -d '1918-11-11 11:00 GMT' wwi-armistice
+      touch now
+      sleep 1
+      touch now1
+      TZ=UTC0 ~/cs35L/assignment5/buggyCoreutils/bin/ls -lt 
+         --full-time wwi-armistice now now1
+
+OUTPUT: 
+-rw-r--r-- 1 codyd csugrad 0 2054-12-17 09:28:16.000000000 -0800 wwi-armistice
+-rw-r--r-- 1 codyd csugrad 0 2020-11-09 18:46:31.814063000 -0800 now1
+-rw-r--r-- 1 codyd csugrad 0 2020-11-09 18:46:26.092825000 -0800 now
+
+=> Attempting to reproduce the error in my home directory produced surprising
+resuls. Unlike before when the wwi-armistice file was perceived as a file from
+the future but labeled with an appropriate date, is now perceived as a file
+from the future but with a date from the future (2054-12-17). According to the
+response that Professor Eggert gave on Piazza, this is because the SEASNet file
+system used for home directories are stored on a networked file system that 
+represent dates with a smaller number of bits. Since there are less bits
+available, inaccurate time stamps will be produced.

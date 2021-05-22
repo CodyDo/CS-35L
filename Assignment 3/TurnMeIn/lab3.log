@@ -1,0 +1,217 @@
+Cody Do
+105140467 
+
+Assignment 3 -- Lab: Spell-checking Hawaiian
+
+1.
+CMD: locale
+The LC_CTYPE was equal to "en_US.UTF-8" instead of "C" or "POSIX" so I ran 
+the "export LC_ALL='C'" command next to change it.
+
+2.
+CMD: locale
+Just checked to make sure everything changed and it did.
+
+3.
+CMD: sort /usr/share/dict/words > words
+Successfully pulled the words from the given path and sorted them in
+alphabetical order.
+
+4.
+CMD: wget https://web.cs.ucla.edu/classes/fall20/cs35L/assign/assign3.html
+Pulled the assignment's html data to my current directory
+
+5.
+CMD: tr -c 'A-Za-z' '[\n*]' < assign3.html
+tr is the translate command, allowing one to change the the first set of 
+quotes with the second set. The -c means to take the complement of the first
+set of quotes. Thus, this command takes all non-alphabetical characters and
+change them to a newline. Since the first and second sets need to have the same
+number of characters, adding the * after \n simply means "keep adding \n into
+the second set until the first and second set has an equal amount of characters".
+
+6.
+CMD: tr -cs 'A-Za-z' '[\n*]' < assign3.html
+This command works similarly to the above command, except there is an added
+'s' after the '-c'. This 's' means that if there are a group of two or more
+non-alphabetical characters in a row, they are all treated as one unit and
+only one newline is created for that unit.
+
+7.
+CMD: tr -cs 'A-Za-z' '[\n*]' < assign3.html | sort 
+This command will do what the command above does. After that, the output
+is piped into the 'sort' command, which will then organize everything 
+alphabetically.
+
+8.
+CMD: tr -cs 'A-Za-z' '[\n*]' < assign3.html | sort -u 
+This command will do what the command above does. However, the presence
+of '-u' after the sort command will cause any duplicate words to be
+removed. Thus, only one instance of each word will be present.
+
+9.
+CMD: tr -cs 'A-Za-z' '[\n*]' < assign3.html | sort -u | comm - words
+This command will do what the command above does. Afterwards, it will take
+the output of the unique sort and pipe it into the comm command. The '-'
+simply means tells the comm command that the first input should be the
+whatever is input (in this case, the product of the sort). This is then
+compared with the 'words' file, producing a three column output. The
+first column are words unique to the sort output, the second column are
+words unique to the 'words' file, and the third output are words present
+in both.
+
+10.
+CMD: tr -cs 'A-Za-z' '[\n*]' < assign3.html | sort -u | comm -23 - words
+This command will do exactly what the command above does. However, the
+presence of '-23' after comm means that the second and third columns are
+blocked from appearing. Thus, the only output will be the first column
+which contains words that are don't appear in the 'words' file and are
+unique only to assign3.html.
+
+11.
+CMD: wget https://www.mauimapp.com/moolelo/hwnwdshw.htm
+This command pulled the Hawaiian words website that we're using and placed
+it in my directory.
+
+12.
+CMD: emacs hwnwdshw.htm
+Looked through the file quickly to see how everything is formatted. It looks
+like all the words are kept inside <td> ... </td> tags.
+
+13.
+CMDs: man sed (and after) man grep
+Looked through the manuals for sed and grep to see flags available for use
+
+14.
+CMD: emacs buildwords
+Created the bash file with the following code:
+
+### START OF CODE ###
+
+#!/bin/bash                                                                     
+
+# -o allows me match whatever is in the tag. '.*' allows me to match any        
+# combination of characters between the two tags  
+                              
+grep -o '<td>.*</td>' |
+
+# sed's structure is "s/ORGINAL/REPLACEMENT/FLAGS". I originally tried          
+# sed 's/<td>//g' | sed 's/<[/]td>//g' but it left other tags in the text.      
+# Thus, I reworked it so that it would delete everything within a set of        
+# < > tags excluding > (to prevent a deletion of everything).     
+              
+sed 's/<[^>]*>//g' |
+
+# Remove any question marks and turn them into newlines     
+                    
+tr '?' '\n' |
+
+# Squeezes multiple newlines into a single newline.    
+                         
+tr -s '\n' '\n' |
+
+# The Hawaiian words appear at every odd line except for the first              
+# However, the ordering flips halfway through (there is an instance             
+# of two Hawaiian words back to back). So I add an extra space in               
+# between these words so that all the Hawaiian words are displayed              
+# when outputting every odd line                    
+                            
+sed 's/Kahako/Kahako\n/' | sed -n '1~2p' |
+
+# Replaces the Hawaiian grave accent ` with an apostrophe '   
+                  
+sed "s/\`/\'/g" |
+
+# Replaces all '-' with a space                 
+                                
+sed 's/-/ /g' |
+
+# Hawaiian words with spaces in them should be separated     
+                   
+sed 's/ /\n/g' |
+
+# Squeeze all the newlines again so one word per line      
+                     
+tr -s '\n' '\n' |
+
+# Turns all uppercase to lowercase                 
+                             
+tr '[:upper:]' '[:lower:]' |
+
+# Makes sure that all the words remaining contain only Hawaiian                 
+# letters                                                       
+                
+sed "/[^pk'mnwlhaeiou]/d" |
+
+# Do a unique sort to fix up any ordering changes made     
+                     
+sort -u
+
+### END OF CODE ###
+
+15.
+CMD: chmod +x buildwords
+Gives myself executable access to run buildwords and test it
+
+16.
+CMD: cat hwnwdshw.htm | ./buildwords | less
+Using the test command given on the website to make sure it runs
+
+17.
+CMD: cat hwnwdshw.htm | ./buildwords > hwords
+Placed the output from my buildwords bash file into hwords
+
+18.
+HAWAIIANCHECKER: tr -cs "A-Za-z\'" '[\n*]'| tr '[:upper:]' '[:lower:]' |
+sort -u | comm -23 - hwords
+The only difference between this command and the ENGLISHCHECKER command is
+that an apostrophe is added into the acceptable letters and all uppercase
+characters are turned into lowercase.
+
+19.
+CMD: tr -cs "A-Za-z\'" '[\n*]' < assign3.html | tr '[:upper:]' '[:lower:]' | 
+sort -u | comm -23 - hwords > misHawaiian
+Used to store the words in assign3.html that are misspelled Hawaiian words 
+in the file "misHawaiian".
+
+20.
+CMD: tr -cs 'A-Za-z' '[\n*]' < assign3.html | sort -u | comm -23 - words 
+> misEnglish
+Used to store the words in assign3.html that are misspelled English words 
+in the file "misEnglish".
+
+21.
+CMD: wc -w misHawaiian
+Checks how many misspelled Hawaiian words are in assign3.html (580 words)
+
+22.
+CMD: wc -w misEnglish
+Checks how many misspelled English words are in assign3.html (104 words)
+
+23.
+CMD: tr -cs "A-Za-z\'" '[\n*]' < misEnglish | tr '[:upper:]' '[:lower:]' | 
+sort -u | comm -12 - hwords > misEngNotHaw
+Runs HAWAIIANCHECKER on the words that ENGLISHCHECKER thought were misspelled.
+Stores the output to misEngNotHaw 
+
+24.
+CMD: wc -w misEngNotHaw
+Checks the number of words misspelled in English but not Hawaiian (4)
+Ex: wiki and lau
+
+25
+CMD: tr -cs "A-Za-z" '[\n*]' < misHawaiian | sort -u | comm -12 - words 
+> misHawNotEng
+Runs ENGLISHCHECKER on the words that HAWAIIANCHECKER thought were misspelled.
+Stores the output to misHawNotEng 
+
+26.
+CMD: wc -w misEngNotHaw
+Checks the number of words misspelled in Hawaiian but not English (518)
+Ex: accent and accepts
+
+
+### HW ###
+I left comments everywhere in my code! It should sufficiently explain 
+my thought process when making it.
+

@@ -1,0 +1,361 @@
+Cody Do
+105140467
+
+Assignment 6 -- Lab 
+
+### START OF lab.txt ###
+1. 
+I wrote the tr2b.c and tr2u.c files. For tr2b.c, I started by creating checks on
+the arguments to make sure there were 1) not too many arguments, 2) mismatching
+lengths of arguments, and 3) duplicates in the 'from' arguments. After making
+sure everything was okay, I created a while loop that would take input from stdin,
+scan through the 'from' string, and properly translate it to the approach character
+in the 'to' string. Once I built tr2b.c, I copied it into a second file and began
+working on tr2u.c from the same structure. For the most part, everything stayed the
+same. The only difference was that anywhere function calls were used to print or
+write, I replaced them with system calls.
+
+
+2.
+CMDS: gcc -Wall -std=c99 -g -o tr2b tr2b.c
+      gcc -Wall -std=c99 -g -o tr2u tr2u.c
+
+=> Compiled using gcc. Based off the command given by the professor on piazza. 
+
+
+3.
+CMD: head --bytes=5000000 /dev/urandom > bigboy.txt
+
+=> Used 'head' to pull the first 5,000,000 bytes of information from /dev/urandom
+and place it into the 'bigboy.txt' file. 
+
+
+4. 
+CMD: man strace
+
+=> I read man to find the approach flags. -c will provide a summary of what
+strace will output.
+
+
+5. 
+CMD: strace -c ./tr2b 'abc' 'xyz' < bigboy.txt > tr2b_strace.txt
+
+=> Shows summary of tr2b system calls when copying to another file
+
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 58.47    0.000145           0       611           write
+ 41.53    0.000103           0       613           read
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         4           fstat
+  0.00    0.000000           0         9           mmap
+  0.00    0.000000           0         4           mprotect
+  0.00    0.000000           0         1           munmap
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000248                  1250         1 total
+
+
+6. 
+CMD: strace -c ./tr2u 'abc' 'xyz' < bigboy.txt > tr2u_strace.txt
+
+=> Shows summary of tr2u system calls when copying to another file
+
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 54.96   24.871006           4   5000000           write
+ 45.04   20.383471           4   5000002           read
+  0.00    0.000043           6         7           mmap
+  0.00    0.000027           6         4           mprotect
+  0.00    0.000012          12         1           munmap
+  0.00    0.000008           4         2           open
+  0.00    0.000006           3         2           close
+  0.00    0.000003           1         2           fstat
+  0.00    0.000003           3         1           arch_prctl
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+------ ----------- ----------- --------- --------- ----------------
+100.00   45.254579              10000024         1 total
+
+
+
+7. 
+CMD: strace -c ./tr2b 'abc' 'xyz' < bigboy.txt 
+
+=> Shows summary of tr2b system calls when copying to terminal
+
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 97.73    0.064177           3     19952           write
+  2.27    0.001490           2       613           read
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         4           munmap
+  0.00    0.000000           0         9           mmap
+  0.00    0.000000           0         4           mprotect
+  0.00    0.000000           0         1           fstat
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.065667                 20591         1 total
+
+
+8. 
+CMD: strace -c ./tr2u 'abc' 'xyz' < bigboy.txt 
+
+=> Shows summary of tr2u system calls when copying to terminal
+
+
+------ ----------- ----------- --------- --------- ----------------
+ 55.02   26.571237           5   5000000           write
+ 44.98   21.721735           4   5000002           read
+  0.00    0.000045          45         1           brk
+  0.00    0.000044           6         7           mprotect
+  0.00    0.000044          44         1           fstat
+  0.00    0.000028          14         2           open
+  0.00    0.000026           6         4           munmap
+  0.00    0.000015          15         1         1 access
+  0.00    0.000011          11         1           mmap
+  0.00    0.000010           5         2           close
+  0.00    0.000009           4         2           execve
+  0.00    0.000002           2         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00   48.293206              10000024         1 total
+
+
+9. Analysis
+
+=> Based on the tests and outputs given above, we can see that tr2u takes
+a significantly longer time than tr2b does. This is likely do to the enormous
+amount of system calls that tr2u takes. To see this more clearly, I need to
+check the time of these programs.
+
+
+10. 
+CMD: time ./tr2b 'abc' 'xyz' < bigboy.txt > tr2b_strace.txt
+
+=> Measures speed of tr2b when copying to another file
+
+
+real	0m0.365s
+user	0m0.278s
+sys	0m0.010s
+
+
+11. 
+CMD: time ./tr2u 'abc' 'xyz' < bigboy.txt > tr2u_strace.txt
+
+=> Measures speed of tr2b when copying to another file
+
+
+real	0m10.326s
+user	0m1.419s
+sys	0m8.833s
+
+
+12.
+CMD: time ./tr2b 'abc' 'xyz' < bigboy.txt
+
+=> Measures speed of tr2b when copying to terminal
+
+
+real	0m0.730s
+user	0m0.313s
+sys	0m0.106s
+
+
+13. 
+CMD: time ./tr2u 'abc' 'xyz' < bigboy.txt
+
+=> Measures speed of tr2u when copying to terminal
+
+
+real	0m9.478s
+user	0m1.385s
+sys	0m8.071s
+
+14. Analysis
+
+=> Looking at the time data, all the data as a whole, we an effectively say that
+tr2u is slower than tr2b (unbuffered is slower than buffered). The root of this
+slowdown is likely the enormous amount of system calls that tr2u makes.
+
+
+### END OF lab.txt ###
+
+Commands used to compile and test sfrobu. These were pulled from Assignment 5.
+
+gcc -Wall -std=c99 -g -o sfrobu sfrobu.c
+python3 grow-test2.py | ./sfrobu | od -ta
+printf '*~BO *{_CIA *hXE]D *LER #@_GZY #E\\OX #^BO #FKPS #NEM\4' | ./sfrobu | od -ta
+python3 grow-test2.py | valgrind --leak-check=full ./sfrobu | od -ta
+printf '*~BO *{_CIA *hXE]D *LER #@_GZY #E\\OX #^BO #FKPS #NEM\4' | valgrind --leak-
+	check=full ./sfrobu | od -ta
+./sfrobu < large_input2.txt > largeInputOutput
+diff largeInputOutput sfrob_output_FOR_large_input2.txt 
+
+1. 
+CMDS: yes abcdefghijklmnopqrstuvwxyz | head -n 0 > test0.txt
+      yes abcdefghijklmnopqrstuvwxyz | head -n 100 > test1h.txt
+      yes abcdefghijklmnopqrstuvwxyz | head -n 10000 > test10k.txt
+      yes abcdefghijklmnopqrstuvwxyz | head -n 1000000 > test1m.txt
+
+=> Generates files with 0, 100, 10000, and 1000000 lines that all say the alphabet.
+
+
+2.
+CMD: time ./sfrob < test0.txt
+
+OUTPUT:
+
+real	0m0.002s
+user	0m0.001s
+sys	0m0.000s
+
+
+3.
+CMD: time ./sfrobu < test0.txt
+
+OUTPUT:
+
+real	0m0.002s
+user	0m0.001s
+sys	0m0.000s
+
+
+3.
+CMD: time ./sfrob < test1h.txt
+
+OUTPUT:
+
+real	0m0.003s
+user	0m0.002s
+sys	0m0.000s
+
+
+4.
+CMD: time ./sfrobu < test1h.txt
+
+OUTPUT:
+
+real	0m0.004s
+user	0m0.000s
+sys	0m0.003s
+
+
+5.
+CMD: time ./sfrob < test10k.txt
+
+OUTPUT:
+
+real	0m0.049s
+user	0m0.029s
+sys	0m0.014s
+
+
+6.
+CMD: time ./sfrobu < test10k.txt
+
+OUTPUT:
+
+real	0m0.214s
+user	0m0.046s
+sys	0m0.163s
+
+
+7.
+CMD: time ./sfrob < test1m.txt
+
+OUTPUT:
+
+real	0m7.364s
+user	0m2.271s
+sys	0m1.547s
+
+
+8.
+CMD: time ./sfrobu < test1m.txt
+
+OUTPUT:
+
+real	0m25.144s
+user	0m3.777s
+sys	0m17.247s
+
+
+9. Analysis
+
+=> We are asked to find CPU Time cost as a function of input lines. By plotting
+the data as points following the format of (number of input lines, real time)
+and performing a linear regression, I get the following:
+
+For sfrob:  f(x) = 0.00001x - 0.00675
+For sfrobu: f(x) = 0.00003x - 0.01127
+
+where x = the number of input lines and f(x) = the real time taken.
+
+
+10. strace -c ./sfrobu < test10k.txt
+    strace -c ./sfrobu < test1m.txt
+
+=> I used these commands to look at the system calls used to try to deduce
+what system calls are used. I then read through the manual of some of the
+more confusing ones.
+
+11. Analysis & Conclusion
+
+=> Looking at the data from strace under the 'syscalls' column and reading the
+man pages of them, I can conclude that brk, srbrk, mmap, munmap, and mremap 
+deal with memory allocation. I have included a summary on their arguments and 
+how to use them (pulled from their manuals).
+
+int brk(void *addr)
+- Sets the end of the data segment to the value specified by addr, when
+that value is reasonable and the system has enough memory. Likely used in malloc().
+
+
+void *sbrk(intptr_t increment)
+- Increments the program's data space by increment bytes. Likely used by
+realloc().
+
+
+int mmap(void *addr, size_t length)
+- Creates a new mapping in the virtual address space of the calling process.
+The starting address for the new mapping is specified in addr. The length 
+argument specifies the length of the mapping. Likely used in malloc().
+
+
+int munmap(void *addr, size_t length)
+- Deletes the mappings for the specified address range, and causes further 
+references to addresses within the range to generate invalid memory references.
+Likely used in free().
+
+
+void *mremap(void *old_address, size_t old_size,
+                    size_t new_size, int flags, ... /* void *new_address */)
+- Expands (or shrinks) an existing memory mapping, potentially moving it at the 
+same time. Old address is the old address of the virtual memory block, old size
+is the size of the old memory block, new size is the size of the new requested
+block and flags are any appropriate flags. A new address may be provided. 
+Likely used in realloc().
+
+
+Conclusion:
+Between sfrob and sfrobu, it's clear that sfrobu is much slower. This is due
+to the frequent usage of system calls, which are very costly since they require
+a change in privilege (a switch to the kernel is required). Furthermore, sfrob's
+speed is due to how library calls (like fprintf or putchar) efficiently make use
+of system calls rather than calling them haphazardly. 
+
+
+

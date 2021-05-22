@@ -1,0 +1,498 @@
+Cody Do
+105140467
+
+Assignment 7 -- Lab: Who's linked to what?
+
+1)
+CMDS: emacs simpgmp.c
+      gcc -Wall -lgmp -std=c99 -g -o simpgmp simpgmp.c
+      ./simpgimp 3
+      ./simpgimp 5
+
+=> Created the simpgmp.c file on the linux serves. Pasted the code below into
+the document (pulled directly from the assignment7 website). Afterwards, I
+built the simpgmc.c file with testing flags enabled just in case they are needed
+for later use. Also used the -lgmp linker flag since GMP is used. Tested using
+3 and 5 to ensure everything is working properly.
+
+#include <gmp.h>
+#include <errno.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int
+err (char const *format, ...)
+{
+  va_list args;
+  va_start (args, format);
+  vfprintf (stderr, format, args);
+  va_end (args);
+  return EXIT_FAILURE;
+}
+
+int
+main (int argc, char **argv)
+{
+  if (argc != 2)
+    return err ("%s: usage: %s exponent\n", argv[0], argv[0]);
+  errno = 0;
+  char *end;
+  unsigned long exponent = strtoul (argv[1], &end, 10);
+  if (argv[1] == end || *end || errno == ERANGE)
+    return err ("%s: %s: invalid exponent\n", argv[0], argv[1]);
+  mpz_t z;
+  mpz_init (z);
+  mpz_ui_pow_ui (z, 2, exponent);
+  if (! (mpz_out_str (stdout, 10, z)
+	 && printf ("\n") == 1
+	 && fflush (stdout) == 0))
+    return err ("%s: output error\n", argv[0]);
+  return EXIT_SUCCESS;
+}
+
+
+CMD: gcc -Wall -lgmp -std=c99 -g -o simpgmp simpgmp.c
+
+=> Built the simpgmc.c file with testing flags enabled (for use later if needed).
+Also used the -lgmp linker flag since GMP is used.
+
+
+2)
+CMDS: gcc -std=c99 -o checkNum checkNum.c
+      ./simpgmp 24
+      ./simpgmp 16777216 > bigNumber
+      ./checkNum < bigNumber
+      emacs bigNumber M->
+
+=> I wrote a c program that took input from stdin until end of file. It incremented
+per character and output the amount at the end (the code is below). I compiled
+checkNum, checked the value of 2**24 using ./simpgmp 24, then used this output
+value for the next simpgmp to compute 2**(2**24). My checkNum program output
+"Num of Decimals: 5050446" which is the appropriate amount. I then used emacs to
+check the first four digits and the last four digits. They were "1818" and "7536"
+respectively, which is correct.
+
+#include <string.h>
+#include <stdio.h>
+
+int main (int argc, char**argv) {                                       
+  int numDecimals = 0;
+
+  char c = getchar();
+  while (!feof(stdin)) {
+    numDecimals++;
+    c = getchar();
+  }
+
+  printf("Num of Decimals: %d\n", numDecimals-1);
+}
+
+
+3)
+CMD: ldd ./simpgmp
+
+OUTPUT: 
+	linux-vdso.so.1 =>  (0x00007ffda49ed000)
+	libgmp.so.10 => /lib64/libgmp.so.10 (0x00007fb5b3a0c000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007fb5b363e000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fb5b3c84000)
+
+=> Used ldd to see what dynamic libraries simpgmp uses.
+
+
+4)
+CMD: strace ./simpgmp
+
+OUTPUT:
+execve("./simpgmp", ["./simpgmp"], 0x7ffdeec67720 /* 34 vars */) = 0
+brk(NULL)                               = 0x1ef6000
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fd098916000
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+open("/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=160424, ...}) = 0
+mmap(NULL, 160424, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7fd0988ee000
+close(3)                                = 0
+open("/lib64/libgmp.so.10", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\200\304\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=495720, ...}) = 0
+mmap(NULL, 2584736, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fd09847e000
+mprotect(0x7fd0984f4000, 2093056, PROT_NONE) = 0
+mmap(0x7fd0986f3000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x75000) = 0x7fd0986f3000
+close(3)                                = 0
+open("/lib64/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0`&\2\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=2156240, ...}) = 0
+mmap(NULL, 3985920, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fd0980b0000
+mprotect(0x7fd098273000, 2097152, PROT_NONE) = 0
+mmap(0x7fd098473000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c3000) = 0x7fd098473000
+mmap(0x7fd098479000, 16896, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fd098479000
+close(3)                                = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fd0988ed000
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fd0988eb000
+arch_prctl(ARCH_SET_FS, 0x7fd0988eb740) = 0
+mprotect(0x7fd098473000, 16384, PROT_READ) = 0
+mprotect(0x7fd0986f3000, 8192, PROT_READ) = 0
+mprotect(0x600000, 4096, PROT_READ)     = 0
+mprotect(0x7fd098917000, 4096, PROT_READ) = 0
+munmap(0x7fd0988ee000, 160424)          = 0
+write(2, "./simpgmp: usage: ./simpgmp expo"..., 37./simpgmp: usage: ./simpgmp exponent
+) = 37
+exit_group(1)                           = ?
++++ exited with 1 +++
+
+=> The commands that are related to dynamic linking are mmap, access, open, fstat,
+close, read, mprotect, and munmap.
+
+=> This initial output shows us that the dynamic library ld.so is loaded:
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+open("/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=160424, ...}) = 0
+mmap(NULL, 160424, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7fd0988ee000
+close(3)
+
+=> The next dynamic library loaded and accessed is ld.so.10, seen through the
+next output section:
+open("/lib64/libgmp.so.10", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\200\304\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=495720, ...}) = 0
+mmap(NULL, 2584736, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fd09847e000
+mprotect(0x7fd0984f4000, 2093056, PROT_NONE) = 0
+mmap(0x7fd0986f3000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x75000) = 0x7fd0986f3000
+close(3)  
+
+=> The final dynamic library loaded and accessed is ld.so.6:
+open("/lib64/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0`&\2\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=2156240, ...}) = 0
+mmap(NULL, 3985920, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fd0980b0000
+mprotect(0x7fd098273000, 2097152, PROT_NONE) = 0
+mmap(0x7fd098473000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c3000) = 0x7fd098473000
+mmap(0x7fd098479000, 16896, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fd098479000
+close(3)  
+
+Command Descriptions (pulled from man):
+access: Allows one to access the dynamic libraries
+open: Opens the contents stored in the dynamic libraries
+close: After finished, closes the file contents in the dynamic libraries
+fstat: Pulls information about the file opened
+mmap: Maps the contents of the dynamic libraries into memory
+mprotect: Changes access protect on regions of memory
+read: Reads from file
+
+
+5)
+CMD: ls /usr/bin | awk '(NR-105140467)%251 == 0'
+
+OUTPUT:
+alsaucm
+db2pdf
+ftp-rfc
+hdsploader
+kmenuedit
+mkfontscale
+pambackground
+pilfile.py
+psfaddtable
+sha224sum
+umount
+zip
+
+=> Ran this command to get a list of commands to investigate
+
+6) emacs ldd_script
+   chmod +x ldd_script
+   ./ldd_script
+
+=> Built a script to just run ldd on all 12 of the commands given by the previous
+command. This script was made with the intention of being used for part 7 as well
+(allows me to alter the output by piping to other commands in order to get a
+unique list).
+
+SCRIPT:
+#!/bin/bash                                                                     
+
+for x in "$(ls /usr/bin | awk '(NR-105140467)%251 == 0' $1)";
+do
+        path=`which $x`
+        ldd $path
+done
+
+
+OUTPUT:
+/usr/bin/alsaucm:
+	linux-vdso.so.1 =>  (0x00007ffff935d000)
+	libasound.so.2 => /lib64/libasound.so.2 (0x00007f1adbffa000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007f1adbcf8000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x00007f1adbaf4000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f1adb8d8000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007f1adb50a000)
+	librt.so.1 => /lib64/librt.so.1 (0x00007f1adb302000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f1adc2fa000)
+/usr/bin/db2pdf:
+	not a dynamic executable
+/usr/bin/ftp-rfc:
+	not a dynamic executable
+/usr/bin/hdsploader:
+	linux-vdso.so.1 =>  (0x00007ffc5b7d6000)
+	libasound.so.2 => /lib64/libasound.so.2 (0x00007f1940795000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007f1940493000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x00007f194028f000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f1940073000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007f193fca5000)
+	librt.so.1 => /lib64/librt.so.1 (0x00007f193fa9d000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f1940a95000)
+/usr/bin/kmenuedit:
+	linux-vdso.so.1 =>  (0x00007ffc7c3d7000)
+	libkdeinit4_kmenuedit.so => /lib64/libkdeinit4_kmenuedit.so (0x00007f5ef6bb6000)
+	libkio.so.5 => /lib64/libkio.so.5 (0x00007f5ef66fd000)
+	libQtNetwork.so.4 => /lib64/libQtNetwork.so.4 (0x00007f5ef63b6000)
+	libkdeui.so.5 => /lib64/libkdeui.so.5 (0x00007f5ef5d4b000)
+	libQtGui.so.4 => /lib64/libQtGui.so.4 (0x00007f5ef5066000)
+	libQtSvg.so.4 => /lib64/libQtSvg.so.4 (0x00007f5ef4e0e000)
+	libkdecore.so.5 => /lib64/libkdecore.so.5 (0x00007f5ef493b000)
+	libQtCore.so.4 => /lib64/libQtCore.so.4 (0x00007f5ef444d000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f5ef4231000)
+	libQtXml.so.4 => /lib64/libQtXml.so.4 (0x00007f5ef3fec000)
+	libQtDBus.so.4 => /lib64/libQtDBus.so.4 (0x00007f5ef3d6e000)
+	libstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007f5ef3a67000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007f5ef3765000)
+	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f5ef354f000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007f5ef3181000)
+	libnepomuk.so.4 => /lib64/libnepomuk.so.4 (0x00007f5ef2eb2000)
+	libnepomukquery.so.4 => /lib64/libnepomukquery.so.4 (0x00007f5ef2c69000)
+	libnepomukutils.so.4 => /lib64/libnepomukutils.so.4 (0x00007f5ef2a2d000)
+	libz.so.1 => /lib64/libz.so.1 (0x00007f5ef2817000)
+	libSM.so.6 => /lib64/libSM.so.6 (0x00007f5ef260f000)
+	libICE.so.6 => /lib64/libICE.so.6 (0x00007f5ef23f3000)
+	libX11.so.6 => /lib64/libX11.so.6 (0x00007f5ef20b5000)
+	libXext.so.6 => /lib64/libXext.so.6 (0x00007f5ef1ea3000)
+	libXft.so.2 => /lib64/libXft.so.2 (0x00007f5ef1c8d000)
+	libXau.so.6 => /lib64/libXau.so.6 (0x00007f5ef1a89000)
+	libXpm.so.4 => /lib64/libXpm.so.4 (0x00007f5ef1877000)
+	libstreamanalyzer.so.0 => /lib64/libstreamanalyzer.so.0 (0x00007f5ef15f4000)
+	libstreams.so.0 => /lib64/libstreams.so.0 (0x00007f5ef13bb000)
+	libsolid.so.4 => /lib64/libsolid.so.4 (0x00007f5ef10bb000)
+	libacl.so.1 => /lib64/libacl.so.1 (0x00007f5ef0eb2000)
+	libattr.so.1 => /lib64/libattr.so.1 (0x00007f5ef0cad000)
+	libXrender.so.1 => /lib64/libXrender.so.1 (0x00007f5ef0aa2000)
+	libsoprano.so.4 => /lib64/libsoprano.so.4 (0x00007f5ef07b5000)
+	libssl.so.10 => /lib64/libssl.so.10 (0x00007f5ef0543000)
+	libcrypto.so.10 => /lib64/libcrypto.so.10 (0x00007f5ef00e0000)
+	libqca.so.2 => /lib64/libqca.so.2 (0x00007f5eefdc8000)
+	libattica.so.0.4 => /lib64/libattica.so.0.4 (0x00007f5eeface000)
+	libdbusmenu-qt.so.2 => /lib64/libdbusmenu-qt.so.2 (0x00007f5eef89d000)
+	libXtst.so.6 => /lib64/libXtst.so.6 (0x00007f5eef697000)
+	libXcursor.so.1 => /lib64/libXcursor.so.1 (0x00007f5eef48c000)
+	libXfixes.so.3 => /lib64/libXfixes.so.3 (0x00007f5eef286000)
+	libgthread-2.0.so.0 => /lib64/libgthread-2.0.so.0 (0x00007f5eef084000)
+	libglib-2.0.so.0 => /lib64/libglib-2.0.so.0 (0x00007f5eeed6e000)
+	libpng15.so.15 => /lib64/libpng15.so.15 (0x00007f5eeeb43000)
+	libfreetype.so.6 => /lib64/libfreetype.so.6 (0x00007f5eee884000)
+	libgobject-2.0.so.0 => /lib64/libgobject-2.0.so.0 (0x00007f5eee634000)
+	libXi.so.6 => /lib64/libXi.so.6 (0x00007f5eee424000)
+	libXrandr.so.2 => /lib64/libXrandr.so.2 (0x00007f5eee219000)
+	libXinerama.so.1 => /lib64/libXinerama.so.1 (0x00007f5eee016000)
+	libfontconfig.so.1 => /lib64/libfontconfig.so.1 (0x00007f5eeddd4000)
+	libbz2.so.1 => /lib64/libbz2.so.1 (0x00007f5eedbc4000)
+	liblzma.so.5 => /lib64/liblzma.so.5 (0x00007f5eed99e000)
+	libresolv.so.2 => /lib64/libresolv.so.2 (0x00007f5eed784000)
+	libfam.so.0 => /lib64/libfam.so.0 (0x00007f5eed57c000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x00007f5eed378000)
+	librt.so.1 => /lib64/librt.so.1 (0x00007f5eed170000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f5ef6df1000)
+	libdbus-1.so.3 => /lib64/libdbus-1.so.3 (0x00007f5eecf20000)
+	libsopranoclient.so.1 => /lib64/libsopranoclient.so.1 (0x00007f5eeccd4000)
+	libuuid.so.1 => /lib64/libuuid.so.1 (0x00007f5eecacf000)
+	libxcb.so.1 => /lib64/libxcb.so.1 (0x00007f5eec8a7000)
+	libxml2.so.2 => /lib64/libxml2.so.2 (0x00007f5eec53d000)
+	libudev.so.1 => /lib64/libudev.so.1 (0x00007f5eec327000)
+	libgssapi_krb5.so.2 => /lib64/libgssapi_krb5.so.2 (0x00007f5eec0da000)
+	libkrb5.so.3 => /lib64/libkrb5.so.3 (0x00007f5eebdf1000)
+	libcom_err.so.2 => /lib64/libcom_err.so.2 (0x00007f5eebbed000)
+	libk5crypto.so.3 => /lib64/libk5crypto.so.3 (0x00007f5eeb9ba000)
+	libpcre.so.1 => /lib64/libpcre.so.1 (0x00007f5eeb758000)
+	libffi.so.6 => /lib64/libffi.so.6 (0x00007f5eeb550000)
+	libexpat.so.1 => /lib64/libexpat.so.1 (0x00007f5eeb326000)
+	libsystemd.so.0 => /lib64/libsystemd.so.0 (0x00007f5eeb0f5000)
+	libcap.so.2 => /lib64/libcap.so.2 (0x00007f5eeaef0000)
+	libdw.so.1 => /lib64/libdw.so.1 (0x00007f5eeac9f000)
+	libkrb5support.so.0 => /lib64/libkrb5support.so.0 (0x00007f5eeaa8f000)
+	libkeyutils.so.1 => /lib64/libkeyutils.so.1 (0x00007f5eea88b000)
+	libselinux.so.1 => /lib64/libselinux.so.1 (0x00007f5eea664000)
+	liblz4.so.1 => /lib64/liblz4.so.1 (0x00007f5eea44f000)
+	libgcrypt.so.11 => /lib64/libgcrypt.so.11 (0x00007f5eea1ce000)
+	libgpg-error.so.0 => /lib64/libgpg-error.so.0 (0x00007f5ee9fc9000)
+	libelf.so.1 => /lib64/libelf.so.1 (0x00007f5ee9db1000)
+/usr/bin/mkfontscale:
+	linux-vdso.so.1 =>  (0x00007ffc03d86000)
+	libfontenc.so.1 => /lib64/libfontenc.so.1 (0x00007f2fe3738000)
+	libfreetype.so.6 => /lib64/libfreetype.so.6 (0x00007f2fe3479000)
+	libz.so.1 => /lib64/libz.so.1 (0x00007f2fe3263000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007f2fe2e95000)
+	libbz2.so.1 => /lib64/libbz2.so.1 (0x00007f2fe2c85000)
+	libpng15.so.15 => /lib64/libpng15.so.15 (0x00007f2fe2a5a000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f2fe393f000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007f2fe2758000)
+/usr/bin/pambackground:
+	linux-vdso.so.1 =>  (0x00007ffedefa5000)
+	libnetpbm.so.11 => /lib64/libnetpbm.so.11 (0x00007fe06051b000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007fe060219000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007fe05fe4b000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fe06075b000)
+/usr/bin/pilfile.py:
+	not a dynamic executable
+/usr/bin/psfaddtable:
+	linux-vdso.so.1 =>  (0x00007fffbf4bc000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007f0fc4b5d000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f0fc4f2b000)
+/usr/local/cs/bin/sha224sum:
+	linux-vdso.so.1 =>  (0x00007fff0b7ec000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007f1c970db000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f1c974a9000)
+/usr/bin/umount:
+	linux-vdso.so.1 =>  (0x00007ffd83891000)
+	libmount.so.1 => /lib64/libmount.so.1 (0x00007f4960619000)
+	libblkid.so.1 => /lib64/libblkid.so.1 (0x00007f49603d9000)
+	libuuid.so.1 => /lib64/libuuid.so.1 (0x00007f49601d4000)
+	libselinux.so.1 => /lib64/libselinux.so.1 (0x00007f495ffad000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007f495fbdf000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f4960a64000)
+	libpcre.so.1 => /lib64/libpcre.so.1 (0x00007f495f97d000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x00007f495f779000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f495f55d000)
+/usr/bin/zip:
+	linux-vdso.so.1 =>  (0x00007fffa92e1000)
+	libbz2.so.1 => /lib64/libbz2.so.1 (0x00007fc943ee5000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007fc943b17000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fc9440f5000)
+
+=> From the 12 commands investigated, three gave error messages. Those three
+are db2pdf, ftp-rfc, and pilfile.py. At this point, I used emacs to explore
+the files and see why they all gave the "not a dynamic executable" error.
+
+CMDS: emacs usr/bin/db2pdf
+      emacs usr/bin/ftp-rfc
+      emacs usr/bin/pilfile.py
+
+=> db2pdf and ftp-rfc are both bash scripts while pilfile.py is a python script.
+Scripts are NOT compiled programs and thus cannot be dynamic executables.
+
+
+7)
+CMD: ./ldd_script | grep \.so | sed 's/[\(].*[\)]//' | sed 's/[=].*//'|  sort -u
+
+=> Used regex to filter the list down to what is wanted. grep \.so is used
+to pull only lines that possess ".so" in them (aka the dynamic libraries).
+
+After testing "./ldd_script | grep \.so", I see that it will be helpful
+to remove everything inside the parentheses so we only have the .so
+files left.
+
+sed 's/[\(].*[\)]//' will replace everything within the parentheses with
+nothing, effectively deleting it. The parentheses refer to memory addresses
+and will differ even if there are calls to the same library. Thus, they
+must be removed in order to use sort.
+
+Now all that's left are the names dynamic libraries and their location
+in the system. For example:
+
+    [NAME]		[LOCATION]
+libXcursor.so.1 => /lib64/libXcursor.so.1
+
+To get rid of the locations and just get a list of the dynamic library
+names themselves, I used sed 's/[=].*//' to delete everything that occurs
+after the = sign, including the = sign. 
+
+Finally, we pipe this output into sort -u to provide a sorted
+list of the unique dynamic libraries used by the 12 programs given to me
+in part 5. 
+
+OUTPUT:
+	/lib64/ld-linux-x86-64.so.2 
+	libacl.so.1 
+	libasound.so.2 
+	libattica.so.0.4 
+	libattr.so.1 
+	libblkid.so.1 
+	libbz2.so.1 
+	libcap.so.2 
+	libcom_err.so.2 
+	libcrypto.so.10 
+	libc.so.6 
+	libdbus-1.so.3 
+	libdbusmenu-qt.so.2 
+	libdl.so.2 
+	libdw.so.1 
+	libelf.so.1 
+	libexpat.so.1 
+	libfam.so.0 
+	libffi.so.6 
+	libfontconfig.so.1 
+	libfontenc.so.1 
+	libfreetype.so.6 
+	libgcc_s.so.1 
+	libgcrypt.so.11 
+	libglib-2.0.so.0 
+	libgobject-2.0.so.0 
+	libgpg-error.so.0 
+	libgssapi_krb5.so.2 
+	libgthread-2.0.so.0 
+	libICE.so.6 
+	libk5crypto.so.3 
+	libkdecore.so.5 
+	libkdeinit4_kmenuedit.so 
+	libkdeui.so.5 
+	libkeyutils.so.1 
+	libkio.so.5 
+	libkrb5.so.3 
+	libkrb5support.so.0 
+	liblz4.so.1 
+	liblzma.so.5 
+	libmount.so.1 
+	libm.so.6 
+	libnepomukquery.so.4 
+	libnepomuk.so.4 
+	libnepomukutils.so.4 
+	libnetpbm.so.11 
+	libpcre.so.1 
+	libpng15.so.15 
+	libpthread.so.0 
+	libqca.so.2 
+	libQtCore.so.4 
+	libQtDBus.so.4 
+	libQtGui.so.4 
+	libQtNetwork.so.4 
+	libQtSvg.so.4 
+	libQtXml.so.4 
+	libresolv.so.2 
+	librt.so.1 
+	libselinux.so.1 
+	libSM.so.6 
+	libsolid.so.4 
+	libsopranoclient.so.1 
+	libsoprano.so.4 
+	libssl.so.10 
+	libstdc++.so.6 
+	libstreamanalyzer.so.0 
+	libstreams.so.0 
+	libsystemd.so.0 
+	libudev.so.1 
+	libuuid.so.1 
+	libX11.so.6 
+	libXau.so.6 
+	libxcb.so.1 
+	libXcursor.so.1 
+	libXext.so.6 
+	libXfixes.so.3 
+	libXft.so.2 
+	libXinerama.so.1 
+	libXi.so.6 
+	libxml2.so.2 
+	libXpm.so.4 
+	libXrandr.so.2 
+	libXrender.so.1 
+	libXtst.so.6 
+	libz.so.1 
+	linux-vdso.so.1 
+

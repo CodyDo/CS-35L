@@ -1,0 +1,240 @@
+Cody Do
+105140467
+
+Assignment 9: Lab -- Git Spelunking
+
+1) 
+CMDS: cd ~eggert/src/gnu/emacs-CS-35L
+      man du
+      du -hs
+      du -hs .git
+      cd .git
+      du -h
+
+=> First, I used cd to enter the directory provided by the instructions. Afterwards,
+I read the manual page for du to find more information on how to appropriately
+use the command. After initially using du with no options and receiving an enormous
+amount of information, I found the -h option which would provide the data size in
+human readable form and the -s option which only output the total size. Afterwards,
+I entered the .git repository and looked at all the files and their sizes to
+see which one(s) took up the most size.
+
+Size of the entire directory: 577 M
+
+Size of the .git directory: 455 M
+Size of all the working files (everything BUT .git): 577 M - 455 M = 122 M
+
+OUTPUT:
+8.0K	./info
+60K	./hooks
+4.0K	./branches
+4.0K	./refs/heads/feature
+4.0K	./refs/heads/features
+4.0K	./refs/heads/fix
+4.0K	./refs/heads/heads
+4.0K	./refs/heads/old-branches
+4.0K	./refs/heads/other-branches
+4.0K	./refs/heads/scratch/joaot
+4.0K	./refs/heads/scratch/np
+4.0K	./refs/heads/scratch/ns
+4.0K	./refs/heads/scratch/tzz
+24K	./refs/heads/scratch
+52K	./refs/heads
+4.0K	./refs/tags
+4.0K	./refs/remotes/origin
+8.0K	./refs/remotes
+68K	./refs
+406M	./objects/pack
+7.8M	./objects/info
+414M	./objects
+8.0K	./logs/refs/remotes/origin
+12K	./logs/refs/remotes
+96K	./logs/refs/heads/feature
+8.0K	./logs/refs/heads/features
+56K	./logs/refs/heads/fix
+8.0K	./logs/refs/heads/heads
+100K	./logs/refs/heads/old-branches
+80K	./logs/refs/heads/other-branches
+8.0K	./logs/refs/heads/scratch/joaot
+8.0K	./logs/refs/heads/scratch/np
+12K	./logs/refs/heads/scratch/ns
+16K	./logs/refs/heads/scratch/tzz
+312K	./logs/refs/heads/scratch
+756K	./logs/refs/heads
+772K	./logs/refs
+780K	./logs
+415M	.
+
+=> From this output, it's easy to see that most of the 455 M of space is used
+by the files inside the .objects directory:
+406M	./objects/pack
+7.8M	./objects/info
+414M	./objects
+
+This makes sense as .git/objects is where git stores all the files (and information
+on files).
+
+
+2)
+CMDS: git branch --list | wc -l
+      git branch -r | wc -l
+
+=> After reading the webpage linked by the Hints slide for question 2, I found
+the --list and -r options. --list will display all the local branches while
+-r will display all the remote branches. Piping the output to wc -l will
+provide the number of each.
+
+Local Branches: 176
+Remote Branches: 177
+
+
+3)
+CMD: git remote -v
+
+=> After reading the webpage linked by the Hints slide for question 3, I found
+the -v option. This will show the URLs that git has stored for use when reading 
+and writing to that remote.
+
+
+OUTPUT:
+origin	/u/cs/fac/eggert/src/gnu/emacs (fetch)
+origin	/u/cs/fac/eggert/src/gnu/emacs (push)
+savannah	https://git.savannah.gnu.org/git/emacs.git (fetch)
+savannah	https://git.savannah.gnu.org/git/emacs.git (push)
+
+=> From the output, we can see there there are two remote repositories
+located at https://git.savannah.gnu.org/git/emacs.git and origin.
+
+
+4)
+CMD: git for-each-ref --sort=-committerdate | head -n 10 | sed 's/^.*commit//'
+
+=> After reading the webpage linked by the Hints slide for question 4, I found
+the --sort option which allowed me to sort based on a key. Scrolling through
+the page, I found that 'committerdate' was a valid key. The example at the
+end of the page placed a - before the key, so the same syntax was used above.
+Afterwards, I simply piped the output into head to get the top 10 and then
+removed any excess information so that we're left with only the branch names
+below.
+
+OUTPUT:
+	refs/heads/master
+	refs/remotes/origin/HEAD
+	refs/remotes/origin/master
+	refs/tags/emacs-27.0.91
+	refs/tags/emacs-27.0.90
+	refs/heads/scratch/joaot/make-completion-at-point-function
+	refs/remotes/origin/scratch/joaot/make-completion-at-point-function
+	refs/heads/feature/windows-with-utils
+	refs/remotes/origin/feature/windows-with-utils
+	refs/heads/scratch/completion-api
+
+
+5)
+CMD: git rev-list --count master
+
+=> After reading through the Hints slide for question 5, I found the --count
+option, which allows me to find the number of commits made to the branch
+while suppressing all other output.
+
+OUTPUT/NUMBER OF COMMITS ON MASTER: 141268
+
+
+6)
+CMD: git rev-list --all --count
+
+=> Based off the information gained from the same slide mentioned in the previous
+question, I was able to find the --all option. This option allows me to use all
+the refs in refs/ (including HEAD) as an argument in this command. In essence,
+this command runs --count on all the branches and compiles the information into
+one number.
+
+OUTPUT/TOTAL NUMBER OF COMMITS IN ALL BRANCHES: 145595
+
+Using the formula given in the Hints Slide:
+
+(Number of Commits on Master) / (Number of Commits in All Branches)
+141268 / 145595 = 0.97028
+As a percentage: Roughly 97.03%
+
+
+7)
+CMD: git shortlog -ns --since="2013-01-01 00:00:00" | head -n 10
+
+=> After reading through the webpage linked in the Hints slide for question 7,
+I found the -n option, which sorts output according to the number of commits, the
+-s which suppresses any commit description other than the count number, and the
+--since option which allows me to show commits more recent than a specified
+date. I used "2013-01-01 00:00:00" to specify that any commits made after 00:00:00
+on January 1st, 2013 should be included. If I had not included the "00:00:00", then
+the command would have ignored any commits made January 1st.
+
+OUTPUT:
+  3922	Eli Zaretskii
+  3792	Glenn Morris
+  3784	Paul Eggert
+  1887	Stefan Monnier
+  1833	Lars Ingebrigtsen
+  1671	Michael Albinus
+   671	Dmitry Gutov
+   604	Noam Postavsky
+   568	Juri Linkov
+   506	Alan Mackenzie
+
+
+8)
+CMDS: logout
+      ssh codyd@lnxsrv06.seas.ucla.edu -Y
+      xeyes
+      cd ~eggert/src/gnu/emacs-CS-35L
+      gitk
+
+=> Logged out and signed back in using the -Y option to enable X11 Forwarding. -Y was 
+used instead of -X as -X gave an error when tested with the xeyes command from 
+lab 2.
+
+Commit Legend:
+(A) - 4ea37c2b8b0c5a68fde59770c3536195e0972217
+(B) - 977cd6cb28a37744966ec62f70cf62659f6f302a
+(C) - 625cee531623feddbe3174fad52c7db96ec60bb3
+(D) - 5490ccc5ebf39759dfd084bbd31f464701a3e775
+(E) - 0c06b93c1e467debd401eb0b3be4652fde14fa95
+(F) - 820739bbb572b30b6ce45756c9960e48dca859af
+(G) - 00e4e3e9d273a193620c3a4bb4914e555cb8e343
+(H) - 49cd561dc62ea6b3fbedab7aef0f020733f4cf09
+(I) - abcb2e62dae6aa26308f7ac9efc89247f89cbe65
+(J) - 98ac36efe4ce4bd3a0bca76fc73ce6c7abaa4371
+
+(A) - 2017-09-16 04:41:38 Cope better with C++ and Objective...
+(B) - 2017-09-16 05:53:03 Increment Emacs version to 27.0.50
+(C) - 2017-09-16 05:34:15 Start emacs-26 release branch
+(D) - 2017-09-16 12:17:55 Fix Compilation warning in etags
+(E) - 2017-09-25 11:16:05 Merge from origin/emacs-26
+(F) - 2017-09-23 00:45:46 ; * doc/emacs/display.texi (Display Custom): Fix wording
+(G) - 2017-09-23 11:43:58 Fix undecorated frame resizing issues on NS (bug#28521)
+(H) - 2017-09-25 08:52:24 * test/lisp/tramp-tests.el (tramptest21-file-links): ...
+(I) - 2017-09-25 11:19:07 Merge from origin/emacs-26
+(J) - 2017-09-29 22:06:14 Merge from origin/eamcs-26
+
+
+    (B) ...-----------------(E)---------...---------------(I)---...---(J)	MASTER
+    /			     /				   /	      /
+   /			    /				  /	     /
+(A)		    (D)-...- ...-(F)			 /	    /		BRANCH 1
+   \	       	    /		    \			/	   /
+    \		   /		     \		       /	  /
+     \		  /		      (G)	      /		 /		BRANCH 2
+      \ 	 /			\	     /		/
+       --(C)-...- 		         \	    /	       / 		BRANCH 3
+					  \        /          /
+					   --...--(H)---...---			BRANCH 4
+
+
+
+=> I manually input the given ID numbers and searched for them in the gitk interface.
+After searching for their positions and taking note of their times/commit message 
+(so that finding them later would be easier since pasting isn't available in gitk), I
+put together this diagram relating all of them. The branching positions are based off
+the diagram found in gitk. Ellipses (...) refer to a series of commits between the
+adjacent commits. The commits that merge into master are (E), (I), and (J). We can see
+this through the diagram, as well as the commit messages left by the authors.

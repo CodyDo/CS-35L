@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# -o allows me match whatever is in the tag. '.*' allows me to match any
+# combination of characters between the two tags
+grep -o '<td>.*</td>' |
+
+# sed's structure is "s/ORGINAL/REPLACEMENT/FLAGS". I originally tried
+# sed 's/<td>//g' | sed 's/<[/]td>//g' but it left other tags in the text.
+# Thus, I reworked it so that it would delete everything within a set of
+# < > tags excluding > (to prevent a deletion of everything).
+sed 's/<[^>]*>//g' |
+
+# Remove any question marks and turn them into newlines
+tr '?' '\n' |
+
+# Squeezes multiple newlines into a single newline.
+tr -s '\n' '\n' |
+
+# The Hawaiian words appear at every odd line except for the first
+# However, the ordering flips halfway through (there is an instance
+# of two Hawaiian words back to back). So I add an extra space in
+# between these words so that all the Hawaiian words are displayed
+# when outputting every odd line
+sed 's/Kahako/Kahako\n/' | sed -n '1~2p' |
+
+# Replaces the Hawaiian grave accent ` with an apostrophe '
+sed "s/\`/\'/g" |
+
+# Replaces all '-' with a space
+sed 's/-/ /g' |
+
+# Hawaiian words with spaces in them should be separated
+sed 's/ /\n/g' |
+
+# Squeeze all the newlines again so one word per line
+tr -s '\n' '\n' |
+
+# Turns all uppercase to lowercase
+tr '[:upper:]' '[:lower:]' |
+
+# Makes sure that all the words remaining contain only Hawaiian
+# letters
+sed "/[^pk'mnwlhaeiou]/d" |
+
+# Do a unique sort to fix up any ordering changes made
+sort -u

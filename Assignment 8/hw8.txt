@@ -1,0 +1,285 @@
+Cody Do
+105140467
+
+Assignment 8 -- Homework: Verifying and Publishing a Backported Changed
+
+1)
+Keeping this log updated as I progress through the homework.
+
+
+2) 
+CMDS: git clone https://git.savannah.gnu.org/git/diffutils.git hw8_diffutils
+      cd hw8_diffutils
+      git checkout v3.0 -b quote
+
+=> I clone a new version of diffutils into hw8_diffutils in order to
+start fresh and keep my lab work and homework diffutils separate.
+I then enter the directory and use "git checkout v3.0 -b quote" to 
+check out version 3.0 of diffutils while simultaneously creating a
+new branch called "quote".
+
+OUTPUT:
+Switched to a new branch 'quote'
+
+
+3)
+CMD: patch -p1 < ../quote-3.0-patch.txt
+
+=> Applied the patch held in "quote-3.0-patch.txt" created during the
+Lab portion of the assignment. 
+
+OUTPUT:
+patching file src/cmp.c
+patching file src/diff.c
+patching file src/diff3.c
+patching file src/dir.c
+patching file src/sdiff.c
+patching file src/util.c
+
+
+4)
+=> Clicked on the link provided on the assignment page in order to learn how to
+use add-change-log-entry-other-window (C-x 4 a):
+	C-x 4 a adds a new entry to the change log file for the file I am editing.
+	It visits the change log file and creates a new entry unless the most recent
+	entry is for today’s date and my name. It also creates a new item for the
+	current file.
+
+5)
+CMDS: emacs [file_name]
+      C-x 4 a
+      (Paste appropriate changelog from quote-patch.txt)
+      C-x C-c
+      y
+
+=> Entered each of the four files and added an appropriate changelog. These changelog
+was pulled directly from the official changelog from the original patch. The name
+inside the [ ] below is meant to replace [file_name] above. The exact changelog
+input is included next to it:
+
+[file_name]	[Changelog text]
+src/cmp.c   :  (try_help, specify_ignore_initial, usage, main): Replaced ` with ' in 
+		character string constants, ignoring comments
+src/diff.c  :  (main, try_help, option_help_msgid, specify_value) (compare_files): 
+		Replaced ` with ' in character string constants, ignoring comments
+src/diff3.c :  (main, try_help, option_help_msgid, usage) (read_diff): Replaced ` with 
+		' in character string constants, ignoring comments
+src/dir.c   :  (compare_names): Replaced ` with ' in character string constants,
+		ignoring comments
+src/sdiff.c :  (try_help, usage, check_child_status, main): Replaced ` with ' in 
+		character string constants, ignoring comments
+src/util.c  :  (finish_output): Replaced ` with ' in character string constants,
+		ignoring comments
+
+
+6)
+CMDS: man git-commit
+      git add .
+      git commit -F ./src/ChangeLog
+
+=> Read the man page for "git commit". Found the -F flag which lets me send a 
+file as a message. Used 'git add .' to stage all the files that were tracked/edited.
+I then commit everything to the quote branch using ChangeLog as input.
+
+OUTPUT:
+[quote f1a0fb6] 2020-12-01  Cody Do  <codyd@lnxsrv05.seas.ucla.edu>
+ Committer: Cody Do <codyd@lnxsrv05.seas.ucla.edu>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 6 files changed, 43 insertions(+), 43 deletions(-)
+
+
+7)
+CMD: git format-patch -1 --stdout > ../formatted-patch.txt
+
+=> The above command was used to produce a patch that was output. The output
+was stored into a text file named 'formatted-patch.txt' which is saved in the
+directory prior to "hw8_diffutils".
+
+
+8)
+CMDS: cd ..
+      git clone https://git.savannah.gnu.org/git/diffutils.git hw8_diffutils_test
+      cd hw8_diffutils_test
+      git checkout v3.0 -b patchery
+      git am < ../formatted-patch.txt
+
+=> A fresh version of diffutils was cloned and saved in a new directory named
+hw8_diffutils_test. I entered the new directory and then checked out version 3.0
+while simultaneously creating a new branch named "patchery". I then applied 
+the patch created in the previous step using git am. Now we must build it using
+the same process described in step 13 of the Lab (found in README-hacking)
+
+OUTPUT (git checkout):
+Switched to a new branch 'patchery'
+
+OUTPUT (git am):
+Applying: 2020-12-01 Cody Do <codyd@lnxsrv05.seas.ucla.edu>
+
+
+CMDS: ./bootstrap
+      ./configure
+      make
+      make check
+
+=> Builds everything and no prevalent errors are present. Everything seems to be
+in working order. I'm on lnxsrv05 so no patch is needed after I run ./bootstrap.
+Now we move onto testing.
+
+CMD: ./src/diff . -
+     diff .-
+
+OUTPUT:
+./src/diff: cannot compare '-' to a directory
+
+
+CMD: ./src/diff --help
+     diff --help
+
+OUTPUT:
+Usage: ./src/diff [OPTION]... FILES
+Compare files line by line.
+
+  -i  --ignore-case  Ignore case differences in file contents.
+  --ignore-file-name-case  Ignore case when comparing file names.
+  --no-ignore-file-name-case  Consider case when comparing file names.
+  -E  --ignore-tab-expansion  Ignore changes due to tab expansion.
+  -b  --ignore-space-change  Ignore changes in the amount of white space.
+  -w  --ignore-all-space  Ignore all white space.
+  -B  --ignore-blank-lines  Ignore changes whose lines are all blank.
+  -I RE  --ignore-matching-lines=RE  Ignore changes whose lines all match RE.
+  --strip-trailing-cr  Strip trailing carriage return on input.
+  -a  --text  Treat all files as text.
+
+  -c  -C NUM  --context[=NUM]  Output NUM (default 3) lines of copied context.
+  -u  -U NUM  --unified[=NUM]  Output NUM (default 3) lines of unified context.
+    --label LABEL  Use LABEL instead of file name.
+    -p  --show-c-function  Show which C function each change is in.
+    -F RE  --show-function-line=RE  Show the most recent line matching RE.
+  -q  --brief  Output only whether files differ.
+  -e  --ed  Output an ed script.
+  --normal  Output a normal diff.
+  -n  --rcs  Output an RCS format diff.
+  -y  --side-by-side  Output in two columns.
+    -W NUM  --width=NUM  Output at most NUM (default 130) print columns.
+    --left-column  Output only the left column of common lines.
+    --suppress-common-lines  Do not output common lines.
+  -D NAME  --ifdef=NAME  Output merged file to show '#ifdef NAME' diffs.
+  --GTYPE-group-format=GFMT  Similar, but format GTYPE input groups with GFMT.
+  --line-format=LFMT  Similar, but format all input lines with LFMT.
+  --LTYPE-line-format=LFMT  Similar, but format LTYPE input lines with LFMT.
+    LTYPE is 'old', 'new', or 'unchanged'.  GTYPE is LTYPE or 'changed'.
+    GFMT may contain:
+      %<  lines from FILE1
+      %>  lines from FILE2
+      %=  lines common to FILE1 and FILE2
+      %[-][WIDTH][.[PREC]]{doxX}LETTER  printf-style spec for LETTER
+        LETTERs are as follows for new group, lower case for old group:
+          F  first line number
+          L  last line number
+          N  number of lines = L-F+1
+          E  F-1
+          M  L+1
+    LFMT may contain:
+      %L  contents of line
+      %l  contents of line, excluding any trailing newline
+      %[-][WIDTH][.[PREC]]{doxX}n  printf-style spec for input line number
+    Either GFMT or LFMT may contain:
+      %%  %
+      %c'C'  the single character C
+      %c'\OOO'  the character with octal code OOO
+
+  -l  --paginate  Pass the output through 'pr' to paginate it.
+  -t  --expand-tabs  Expand tabs to spaces in output.
+  -T  --initial-tab  Make tabs line up by prepending a tab.
+  --tabsize=NUM  Tab stops are every NUM (default 8) print columns.
+  --suppress-blank-empty  Suppress space or tab before empty output lines.
+
+  -r  --recursive  Recursively compare any subdirectories found.
+  -N  --new-file  Treat absent files as empty.
+  --unidirectional-new-file  Treat absent first files as empty.
+  -s  --report-identical-files  Report when two files are the same.
+  -x PAT  --exclude=PAT  Exclude files that match PAT.
+  -X FILE  --exclude-from=FILE  Exclude files that match any pattern in FILE.
+  -S FILE  --starting-file=FILE  Start with FILE when comparing directories.
+  --from-file=FILE1  Compare FILE1 to all operands.  FILE1 can be a directory.
+  --to-file=FILE2  Compare all operands to FILE2.  FILE2 can be a directory.
+
+  --horizon-lines=NUM  Keep NUM lines of the common prefix and suffix.
+  -d  --minimal  Try hard to find a smaller set of changes.
+  --speed-large-files  Assume large files and many scattered small changes.
+
+  -v  --version  Output version info.
+  --help  Output this help.
+
+FILES are 'FILE1 FILE2' or 'DIR1 DIR2' or 'DIR FILE...' or 'FILE... DIR'.
+If --from-file or --to-file is given, there are no restrictions on FILES.
+If a FILE is '-', read standard input.
+Exit status is 0 if inputs are the same, 1 if different, 2 if trouble.
+
+Report bugs to: bug-diffutils@gnu.org
+GNU diffutils home page: <http://www.gnu.org/software/diffutils/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+
+=> No ` is present when running "./src/diff . -" or "./src/diff --help". It 
+appears  that the changes were properly applied. The "diff . -" and "diff --help" 
+were also run to allow me to compare.
+
+
+9)
+CMDS: make distdir
+      cd diffutils-3.0.1-7ef1
+      ls
+      emacs ChangeLog
+
+=> Used distdir as directed by the assignment page. I then entered the new directory
+created by the command (diffutils-3.0.1-7ef1. After looking at the files present in
+the directory, I used emacs to open the ChangeLog. I can see that all of the changelog
+entries I added in step 5 are present. The patch has been applied properly.
+
+
+10)
+CMDS: ssh -X codyd@lnxsrv05.seas.ucla.edu
+      export PATH=/usr/local/cs/bin:$PATH
+      cd ~eggert/src/gnu/emacs-CS-35L
+      gitk
+
+=> Referenced assignment 2 while doing this. I logged out and signed back in using
+the -X flag to allow X11 forwarding. After running gitk, a large window appeared with
+multiple windows. A description of the subwindows is provided below:
+
+Top-Left: A visual branch view of all the commits. Each commit is represented by
+	  a circle with lines connecting them, which are representative of branches
+	  and merges. The commit message is displayed by each circle.
+
+Top-Middle: This windows provides the name and email for each commit author.
+
+Top-Right: This window provides the timestamp for each commit in the form of
+	   YYYY-MM-DD and time as ##:##:##. 
+
+Bottom-Left: This window provides the most information for each commit. It provides
+	     all the information above, as well as telling us any parent commits,
+	     child commits, branches, what the commit follows, and what it precedes.
+	     There is also the the ability to switch between the old version (pre-commit)
+	     the new version (post commit) and to see the differences/changes.
+
+Bottom-Right: This window simply lists the files that were altered in the commit.
+
+=> The assignment then asks us to "find the newest merge that is not newer than 2015-01-25." In essence, it is asking us to find the merge closest to 2015-01-25
+but not older than that date (look for anything 2015-01-24 or older). Looking
+through the timeline and information provided by the top windows, I can see that
+there was a commit made by Paul Eggert on 2015-01-24 19:00:41 with a description
+of "indent/shell.sh (bar): Use '[ $# -eq 0 ]', not '[ $# == 0 ]'.". However, this
+is merely a commit and NOT a merge, so I must look further until I see a merge
+appear on the tree. This brings me to a branch merge with master done by Joakim
+Verona on 2015-01-24 17:11:31. This is the "newest merge that is not newer than
+2015-01-25."
